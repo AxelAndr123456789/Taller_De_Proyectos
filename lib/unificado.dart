@@ -49,14 +49,8 @@ class ResultManager {
   
   ResultManager._internal();
   
-  // Lista de resultados recientes (en una app real, esto se guardaría en una base de datos)
-  List<TestResult> _recentResults = [
-    TestResult(
-      testType: 'Aptitud Profesional',
-      testTitle: 'Test de Aptitud Profesional',
-      completionDate: DateTime(2024, 1, 15),
-    ),
-  ];
+  // Lista de resultados recientes - INICIALMENTE VACÍA
+  List<TestResult> _recentResults = [];
   
   // Método para agregar un nuevo resultado
   void addResult(String testType, String testTitle) {
@@ -615,16 +609,36 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Lista de resultados
+                      // Lista de resultados - SIEMPRE mostrar el mensaje cuando no hay resultados
                       if (recentResults.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 20),
-                          child: Text(
-                            'No hay resultados recientes. ¡Completa un test!',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF657C86),
-                            ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.assignment_outlined,
+                                color: Color(0xFF657C86),
+                                size: 60,
+                              ),
+                              SizedBox(height: 12),
+                              Text(
+                                'No hay resultados recientes',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF121617),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Completa un test para ver tus resultados aquí',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF657C86),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         )
                       else
@@ -712,15 +726,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFF657C86),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Tipo: ${result.testType}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF0052FF),
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -1156,23 +1161,22 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
       // TEST COMPLETADO
       _resultManager.addResult(widget.testType, widget.testTitle);
       
+      // SOLO mostrar el mensaje sin botón "Ver Resultados"
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('¡${widget.testTitle} completado!'),
           backgroundColor: Colors.green,
-          duration: const Duration(seconds: 3),
-          action: SnackBarAction(
-            label: 'Ver Resultados',
-            textColor: Colors.white,
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
-              );
-            },
-          ),
+          duration: const Duration(seconds: 2),
         ),
       );
+      
+      // Navegar de vuelta a la pantalla principal
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+        );
+      });
     }
   }
 
@@ -1501,7 +1505,7 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
     );
   }
 
-   Widget _buildNavButton(int index, IconData icon, String label) {
+  Widget _buildNavButton(int index, IconData icon, String label) {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
