@@ -51,6 +51,24 @@ class ResultManager {
   
   // Lista de resultados recientes - INICIALMENTE VACÍA
   List<TestResult> _recentResults = [];
+  // Lista de evaluaciones completadas
+  List<Map<String, String>> _completedEvaluations = [
+    {
+      'titulo': 'Test Vocacional 1',
+      'perfilPrincipal': 'Perfil Principal: Ingeniería',
+      'fecha': '15-01-2024',
+    },
+    {
+      'titulo': 'Test Vocacional 2',
+      'perfilPrincipal': 'Perfil Principal: Medicina',
+      'fecha': '10-01-2024',
+    },
+    {
+      'titulo': 'Test Vocacional 3',
+      'perfilPrincipal': 'Perfil Principal: Artes',
+      'fecha': '05-01-2024',
+    },
+  ];
   
   // Método para agregar un nuevo resultado
   void addResult(String testType, String testTitle) {
@@ -59,6 +77,13 @@ class ResultManager {
       testTitle: testTitle,
       completionDate: DateTime.now(),
     ));
+    
+    // También agregar a evaluaciones completadas
+    _completedEvaluations.insert(0, {
+      'titulo': testTitle,
+      'perfilPrincipal': 'Perfil Principal: ${testType.split(' ').first}',
+      'fecha': DateTime.now().toString().substring(0, 10),
+    });
     
     // Mantener solo los últimos 5 resultados
     if (_recentResults.length > 5) {
@@ -69,6 +94,11 @@ class ResultManager {
   // Método para obtener todos los resultados
   List<TestResult> getRecentResults() {
     return List.from(_recentResults);
+  }
+  
+  // Método para obtener evaluaciones completadas
+  List<Map<String, String>> getCompletedEvaluations() {
+    return List.from(_completedEvaluations);
   }
 }
 
@@ -382,22 +412,24 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     });
     
     if (index == 1) { // Tests
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TestsScreen(selectedIndex: index)),
-      ).then((_) {
-        // Cuando volvemos de Tests, restaurar el índice seleccionado
-        setState(() {
-          _selectedIndex = 0; // Home seleccionado
-        });
-      });
-    } else if (index >= 2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Funcionalidad en desarrollo'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 1),
-        ),
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) { // Resultados
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) { // Carreras
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) { // Perfil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PantallaPerfil()),
       );
     }
   }
@@ -435,7 +467,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF121617),
                             ),
                           ),
                         ),
@@ -464,9 +495,9 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                       // Nueva sección de test
                       InkWell(
                         onTap: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const TestsScreen(selectedIndex: 1)),
+                            MaterialPageRoute(builder: (context) => const TestsScreen()),
                           );
                         },
                         onHover: (hovering) {
@@ -571,6 +602,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                   'https://lh3.googleusercontent.com/aida-public/AB6AXuCcIFpt9OxmhsqKarIdcM7hoFrWzUDCg1xFqSt5E5MpJoivKeT9RBV4HGoH4jmEqGmbL-7r-NUtMEJkvyqfohyofUdBAk0BHntMQ7MwLVrG1f9NbHe_3gFPMsFh94Xw9H1WCVe97098iAS1mOqUnS_mY7rGjacz_dfxK0dHPyHlNUpS-f7ENAAFdd3NOM9BRu-j6-QL9XcaicmkNelkym1zfa3b6WefMgSJavT4WwsgRSOi5LeN6q9f0OyYxui3ZBAHk6Vqsc5zCvnk',
                               title: 'Médico',
                               description: 'Profesional de la salud',
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                                );
+                              },
                             ),
                             const SizedBox(width: 12),
                             _buildCareerCard(
@@ -578,6 +615,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                   'https://lh3.googleusercontent.com/aida-public/AB6AXuBFr1zXdezl1vxFCR7qgHvXVKJJWc6vDf7s_J57A16RMKXIUSq-XD506NmAUhSuVqOwHe1u18Wjc-Atdc599WvvzwLcKt-WEGDS-B3bQUuWf4EsHft0RRS8JBoGEvB9PubKZYQ9_4B3qhj7z16aIhdIBxTauXFcpz4yttdHm3DP-4A7wgaVNcOMyNq4DMswYkJ5lhY_pnzsa66mJ3FyeJQaA9rt0h0nJ3Np2PmRIKinucgmnfajN1-9U8GfIrYFJW1KX1gm58YlNDHh',
                               title: 'Ingeniero',
                               description: 'Diseña y construye',
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                                );
+                              },
                             ),
                             const SizedBox(width: 12),
                             _buildCareerCard(
@@ -585,6 +628,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                   'https://lh3.googleusercontent.com/aida-public/AB6AXuCJFbJLYCEDTWyD5rsxe5XbxVibQ56a9Sr0d1kWBApS1KEzxwb6Zz2xRI6OFrK8USKu5qF8M-_R1EHd-oC-ddwceYOxuQ3uMy4Mro7zJ_Tjur5dvxZ0CJJFfKRDL9jed5xZK8Zrr8Qvedt6EJp1I1NJd5ONPiSIp-diRdEAhgrJ7aIJql0Xe2XZIhu1ZXXvNbVQA6RhXHJu1jWx2ItqPDp8b9OHpRKv7RhPIMUFaJhq86nX02O2itQnCScU4qWzLjtc8OfcrY37I95n',
                               title: 'Arquitecto',
                               description: 'Crea diseños de edificios',
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -609,7 +658,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Lista de resultados - SIEMPRE mostrar el mensaje cuando no hay resultados
+                      // Lista de resultados
                       if (recentResults.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 20),
@@ -684,7 +733,10 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   Widget _buildResultCard(TestResult result) {
     return InkWell(
       onTap: () {
-        print('Resultado de ${result.testType} presionado');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+        );
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -746,6 +798,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     required String imageUrl,
     required String title,
     required String description,
+    required VoidCallback onTap,
   }) {
     return SizedBox(
       width: 150,
@@ -753,9 +806,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            onTap: () {
-              print('Carrera $title seleccionada');
-            },
+            onTap: onTap,
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: 150,
@@ -833,40 +884,40 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
 // ============ PANTALLA DE TESTS ============
 class TestsScreen extends StatefulWidget {
-  final int selectedIndex;
-  
-  const TestsScreen({super.key, required this.selectedIndex});
+  const TestsScreen({super.key});
 
   @override
   State<TestsScreen> createState() => _TestsScreenState();
 }
 
 class _TestsScreenState extends State<TestsScreen> {
-  late int _selectedIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndex = widget.selectedIndex;
-  }
+  int _selectedIndex = 1; // Tests está seleccionado por defecto
 
   void _onItemTapped(int index) {
-    if (index == 0) {
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-      
-      if (index >= 2) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Funcionalidad en desarrollo'),
-            backgroundColor: Colors.blue,
-            duration: Duration(seconds: 1),
-          ),
-        );
-      }
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) { // Inicio
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 2) { // Resultados
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) { // Carreras
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) { // Perfil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+      );
     }
   }
 
@@ -1132,15 +1183,30 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
       _selectedIndex = index;
     });
     
-    if (index == 0) {
-      Navigator.pop(context);
-    } else if (index >= 2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Funcionalidad en desarrollo'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 1),
-        ),
+    if (index == 0) { // Inicio
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) { // Tests
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) { // Resultados
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) { // Carreras
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) { // Perfil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PantallaPerfil()),
       );
     }
   }
@@ -1501,6 +1567,872 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
             ],
           ),
         ),
+      )
+    );
+  }
+
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: isSelected ? 50 : 40,
+            height: isSelected ? 50 : 40,
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
+              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              size: isSelected ? 26 : 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+            ),
+            child: Text(label),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============ PANTALLA DE PERFIL ============
+class PantallaPerfil extends StatefulWidget {
+  const PantallaPerfil({super.key});
+
+  @override
+  State<PantallaPerfil> createState() => _PantallaPerfilState();
+}
+
+class _PantallaPerfilState extends State<PantallaPerfil> {
+  int _selectedIndex = 4; // Perfil está seleccionado
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) { // Inicio
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) { // Tests
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) { // Resultados
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) { // Carreras
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Encabezado con botón de configuración
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'Perfil',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF121617),
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.settings_outlined),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Configuración en desarrollo'),
+                            backgroundColor: Colors.blue,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Información del usuario
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // Foto de perfil
+                    Container(
+                      width: 128,
+                      height: 128,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            'https://lh3.googleusercontent.com/aida-public/AB6AXuBPTBIJNdkM_FxeGD-d_WZYusmK3wl0Xt3O5E5xlXMdvaZSZk_5guG-S6x3skyebN_lMGcdm6SFS-N6IEOkdVfwW9EgXfj4yvMyI8KSi9pBYpKpFWIGLSh8X04577DXHQeo-MCWvgdiy3EcQutd3-LPhHzZFFEFTB4VrOv6weEkVb9fcjkEKzN1lsxRowTEx8F1iaQlntYjVoufyOyOf2gXFGkpWfd1gfAsmDt_sKWR0DPptTOfj76jAZ-VF5UC7DDTEh0Yds_Fujct',
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Nombre
+                    const Text(
+                      'Mateo Vargas',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF121617),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Ocupación
+                    const Text(
+                      'Estudiante',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                        color: Color(0xFF657C86),
+                      ),
+                    ),
+                    // Ubicación
+                    const Text(
+                      'Junín, Perú',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                        color: Color(0xFF657C86),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Título: Información Personal
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Información Personal',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Email
+              _construirItemInformacion(
+                icono: Icons.email_outlined,
+                titulo: 'Email',
+                valor: 'mateo.vargas@email.com',
+              ),
+
+              // Teléfono
+              _construirItemInformacion(
+                icono: Icons.phone_outlined,
+                titulo: 'Teléfono',
+                valor: '+51 987 654 321',
+              ),
+
+              // Título: Información Académica
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Información Académica',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Colegio
+              _construirItemInformacion(
+                icono: Icons.school_outlined,
+                titulo: 'Colegio',
+                valor: 'Colegio Nacional San José',
+              ),
+
+              // Grado
+              _construirItemInformacion(
+                icono: Icons.menu_book_outlined,
+                titulo: 'Grado',
+                valor: '5to año de secundaria',
+              ),
+
+              // Botón Cerrar Sesión
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF0F3F4),
+                      foregroundColor: const Color(0xFF121617),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Cerrar Sesión',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+
+      // Barra de navegación inferior CONSISTENTE
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.only(top: 8, bottom: 20),
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Color(0xFFF0F3F4)),
+          ),
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavButton(0, Icons.home, 'Inicio'),
+            _buildNavButton(1, Icons.list, 'Tests'),
+            _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+            _buildNavButton(3, Icons.work, 'Carreras'),
+            _buildNavButton(4, Icons.person, 'Perfil'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _construirItemInformacion({
+    required IconData icono,
+    required String titulo,
+    required String valor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 72,
+      child: Row(
+        children: [
+          // Icono
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: const Color(0xFFF0F3F4),
+            ),
+            child: Icon(
+              icono,
+              color: const Color(0xFF121617),
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          
+          // Información
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  titulo,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF121617),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  valor,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: isSelected ? 50 : 40,
+            height: isSelected ? 50 : 40,
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
+              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              size: isSelected ? 26 : 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+            ),
+            child: Text(label),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============ PANTALLA DE RECOMENDACIONES DE CARRERAS ============
+class PantallaRecomendacionesCarreras extends StatefulWidget {
+  const PantallaRecomendacionesCarreras({super.key});
+
+  @override
+  State<PantallaRecomendacionesCarreras> createState() => _PantallaRecomendacionesCarrerasState();
+}
+
+class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacionesCarreras> {
+  int _selectedIndex = 3; // Carreras está seleccionado
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) { // Inicio
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) { // Tests
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) { // Resultados
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 4) { // Perfil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Encabezado con botón de retroceso
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    color: const Color(0xFF121617),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        'Recomendaciones de Carreras',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF121617),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                ],
+              ),
+            ),
+
+            // Lista de recomendaciones
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _construirTarjetaCarrera(
+                      compatibilidad: '95% Compatibilidad',
+                      titulo: 'Ingeniería de Software',
+                      descripcion: 'Diseña, desarrolla y prueba aplicaciones de software. Colabora con equipos para crear soluciones innovadoras.',
+                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCmTa2J2w8KiwhBLHYqDM_U-HhJHqs0pWxWmXxAWkJb2XWCKv38ej_TjiGrbG4JD_h6cua8srjt8FWrTXlS4bNl4mWf2qRO39A0hOgTQ7kZA_L_13l0kOWvCAgvFNANY-17Rvfc2f_SPUJsqcHceYpfiIUu5bcHKAWIxUQ_8VkXfXzisPfDw1vcX3ePaiL31Fumd92fLqsydzU4Q5TDSD0QBrKa8iwAkTHR1JUjOABa7Gxj18BogNI3JsHhV--PtJPvIYkCpl0rmDNH',
+                    ),
+                    _construirTarjetaCarrera(
+                      compatibilidad: '92% Compatibilidad',
+                      titulo: 'Enfermería',
+                      descripcion: 'Proporciona atención directa al paciente, administra medicamentos y educa a pacientes y familias sobre el manejo de la salud.',
+                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLeo_Y0QWdhobDt-DLMRlf7LhRlZDYKViqMaUEFuSCzH22DVKtbvQon3TBkXvbGL4ANyNv39AhRewuZmFaXkG8sHxiUzplwLHoAdmW76T_C57a8TsOLMlsC9p9RQByPp9DyqIjdWO5m2zWTunCh2k7CxV2MRhfQNc8d19KlkRngtWKEQQMdAnWWM2JXiQ-E5WULk3D420bUL15YV-VtPJlBDLZXXkCcyk2d1N3j7y8Pr_aTCWyV4ZO1e3_2oQxoG7Qa_9mRcLC2A71',
+                    ),
+                    _construirTarjetaCarrera(
+                      compatibilidad: '88% Compatibilidad',
+                      titulo: 'Ingeniería Mecánica',
+                      descripcion: 'Diseña y analiza sistemas mecánicos, incluyendo máquinas, motores y herramientas. Enfoque en eficiencia e innovación.',
+                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBEq1Y3_XIqaIk670m3aspVVLISiCT0mgpf0_99JfK_lOteRrueFqK4ctByh5B07cMO_bMSofJUMjrFQ1e1uOOXKM35doDIE_ktDMNwOqZYd71PZfvlQ2S5hRgsJ8lUyqdFSjthMTQ1c5OOEiNgZXM7CTPND7kHSLicpMOTu1GoZsrqk7hhZWeTwxj6CjNKxfCjMW_H-5T4tbgWTq_cZJIpiFggoqN_M35iGv08O_IvPYrRLkmov7cU-R0r8HJ0BdB18kkUMO2T7SU8',
+                    ),
+                    _construirTarjetaCarrera(
+                      compatibilidad: '85% Compatibilidad',
+                      titulo: 'Administración de Empresas',
+                      descripcion: 'Gestiona y supervisa operaciones comerciales, incluyendo marketing, finanzas y recursos humanos. Impulsa el éxito organizacional.',
+                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCXpYQX57cWaW_PH3fhFkZbRDI9yIej2zm13RCR2UF6rdjg83TPokK1_R0tSwkobQiepjuIAU2tpIYJv3lzlZPK-1lx9UrZni1waEKJkzHKtpLSrh8aLRSoe_fRJjzxZaOTbfyV1IKQ1hXCj16gpUKpenzZc9I83KRgMkSKNcSb9Jnkl7dwhrnJQxXtBWtAlQ5NL1IVqQAjxPKvScsnlWmsuNzhe2q1ybIeiRsxpkrjJoeoh8aKCVNQlIlMBgq62PFwmRRV1Un53W7k',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Barra de navegación inferior CONSISTENTE
+            Container(
+              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF0F3F4)),
+                ),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavButton(0, Icons.home, 'Inicio'),
+                  _buildNavButton(1, Icons.list, 'Tests'),
+                  _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+                  _buildNavButton(3, Icons.work, 'Carreras'),
+                  _buildNavButton(4, Icons.person, 'Perfil'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _construirTarjetaCarrera({
+    required String compatibilidad,
+    required String titulo,
+    required String descripcion,
+    required String imagenUrl,
+  }) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Contenido de texto
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  compatibilidad,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  titulo,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  descripcion,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 32,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Detalles de $titulo en desarrollo'),
+                          backgroundColor: Colors.blue,
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF0F3F4),
+                      foregroundColor: const Color(0xFF121617),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    child: const Text(
+                      'Ver Detalles',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Imagen
+          Expanded(
+            flex: 1,
+            child: Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  image: NetworkImage(imagenUrl),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: isSelected ? 50 : 40,
+            height: isSelected ? 50 : 40,
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
+              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              size: isSelected ? 26 : 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+            ),
+            child: Text(label),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============ PANTALLA DE HISTORIAL DE EVALUACIONES ============
+class PantallaHistorialEvaluaciones extends StatefulWidget {
+  const PantallaHistorialEvaluaciones({super.key});
+
+  @override
+  State<PantallaHistorialEvaluaciones> createState() => _PantallaHistorialEvaluacionesState();
+}
+
+class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluaciones> {
+  int _selectedIndex = 2; // Resultados está seleccionado
+  final ResultManager _resultManager = ResultManager();
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) { // Inicio
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) { // Tests
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 3) { // Carreras
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) { // Perfil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final completedEvaluations = _resultManager.getCompletedEvaluations();
+    
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Encabezado centrado sin botón de retroceso
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: const Center(
+                child: Text(
+                  'Historial de Evaluaciones',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+              ),
+            ),
+
+            // Título: Evaluaciones Completadas
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Evaluaciones Completadas',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+              ),
+            ),
+
+            // Lista de evaluaciones
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: completedEvaluations.map((evaluacion) {
+                    return _construirItemEvaluacion(
+                      titulo: evaluacion['titulo']!,
+                      perfilPrincipal: evaluacion['perfilPrincipal']!,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+
+            // Barra de navegación inferior CONSISTENTE
+            Container(
+              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF0F3F4)),
+                ),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavButton(0, Icons.home, 'Inicio'),
+                  _buildNavButton(1, Icons.list, 'Tests'),
+                  _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+                  _buildNavButton(3, Icons.work, 'Carreras'),
+                  _buildNavButton(4, Icons.person, 'Perfil'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _construirItemEvaluacion({
+    required String titulo,
+    required String perfilPrincipal,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 72,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Información de la evaluación
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  titulo,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF121617),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  perfilPrincipal,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+
+          // Botón Ver Resultados
+          SizedBox(
+            height: 32,
+            child: ElevatedButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Resultados de $titulo en desarrollo'),
+                    backgroundColor: Colors.blue,
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFF0F3F4),
+                foregroundColor: const Color(0xFF121617),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              child: const Text(
+                'Ver Resultados',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
