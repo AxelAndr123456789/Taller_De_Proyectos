@@ -51,7 +51,7 @@ class ResultManager {
   
   // Lista de resultados recientes - INICIALMENTE VACÍA
   List<TestResult> _recentResults = [];
-  // Lista de evaluaciones completadas
+  // Lista de evaluaciones completadas (PREDETERMINADAS)
   List<Map<String, String>> _completedEvaluations = [
     {
       'titulo': 'Test Vocacional 1',
@@ -78,14 +78,9 @@ class ResultManager {
       completionDate: DateTime.now(),
     ));
     
-    // También agregar a evaluaciones completadas
-    _completedEvaluations.insert(0, {
-      'titulo': testTitle,
-      'perfilPrincipal': 'Perfil Principal: ${testType.split(' ').first}',
-      'fecha': DateTime.now().toString().substring(0, 10),
-    });
+    // NO agregar a evaluaciones completadas (mantener los 3 predeterminados)
     
-    // Mantener solo los últimos 5 resultados
+    // Mantener solo los últimos 5 resultados en recientes
     if (_recentResults.length > 5) {
       _recentResults = _recentResults.sublist(0, 5);
     }
@@ -96,10 +91,27 @@ class ResultManager {
     return List.from(_recentResults);
   }
   
-  // Método para obtener evaluaciones completadas
+  // Método para obtener evaluaciones completadas (solo los 3 predeterminados)
   List<Map<String, String>> getCompletedEvaluations() {
     return List.from(_completedEvaluations);
   }
+}
+
+// ============ MODELO DE CARRERA ============
+class Carrera {
+  final String nombre;
+  final String compatibilidad;
+  final String descripcion;
+  final String imagenUrl;
+  final String portadaUrl;
+
+  const Carrera({
+    required this.nombre,
+    required this.compatibilidad,
+    required this.descripcion,
+    required this.imagenUrl,
+    required this.portadaUrl,
+  });
 }
 
 // ============ PANTALLA DE LOGIN ============
@@ -406,7 +418,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   final ResultManager _resultManager = ResultManager();
 
   // Navegación entre pantallas
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -642,7 +654,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                   ),
                 ),
 
-                // Últimos resultados
+                // Últimos resultados - NO SON BOTONES
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -658,7 +670,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Lista de resultados
+                      // Lista de resultados - NO SON CLICKEABLES
                       if (recentResults.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 20),
@@ -685,7 +697,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                   fontSize: 14,
                                   color: Color(0xFF657C86),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -707,7 +718,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         ),
       ),
 
-      // Barra de navegación inferior
+      // Barra de navegación inferior CON ANIMACIÓN ORIGINAL
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(top: 8, bottom: 20),
         decoration: const BoxDecoration(
@@ -730,66 +741,54 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     );
   }
 
+  // Widget para mostrar resultados recientes - NO ES CLICKEABLE
   Widget _buildResultCard(TestResult result) {
-    return InkWell(
-      onTap: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
-        );
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xFFF0F3F4),
-              ),
-              child: const Icon(
-                Icons.bar_chart,
-                color: Color(0xFF121617),
-              ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFF0F3F4),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    result.testTitle,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF121617),
-                    ),
-                  ),
-                  Text(
-                    'Completado el ${result.formattedDate}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF657C86),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
+            child: const Icon(
+              Icons.bar_chart,
               color: Color(0xFF121617),
-              size: 20,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  result.testTitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+                Text(
+                  'Completado el ${result.formattedDate}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF657C86),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // NO HAY FLECHA porque no es clickeable
+        ],
       ),
     );
   }
@@ -846,35 +845,31 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected
-                  ? const Color(0xFF0052FF).withOpacity(0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
@@ -893,7 +888,7 @@ class TestsScreen extends StatefulWidget {
 class _TestsScreenState extends State<TestsScreen> {
   int _selectedIndex = 1; // Tests está seleccionado por defecto
 
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -940,30 +935,47 @@ class _TestsScreenState extends State<TestsScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Encabezado con botón de retroceso y título centrado
             Container(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    color: const Color(0xFF111618),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  // Flecha de retroceso a la izquierda
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF111618),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
                   ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        'Tests',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF111618),
-                        ),
+                  
+                  // Título perfectamente centrado
+                  const Center(
+                    child: Text(
+                      'Tests',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111618),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  
+                  // Widget invisible del mismo tamaño que el IconButton para balancear
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48, // Mismo ancho que el IconButton
+                      height: 48,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1114,33 +1126,31 @@ class _TestsScreenState extends State<TestsScreen> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
@@ -1178,7 +1188,7 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
     'Totalmente de acuerdo',
   ];
 
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -1262,30 +1272,47 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Encabezado con botón de retroceso y título centrado
             Container(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    color: const Color(0xFF111618),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  // Flecha de retroceso a la izquierda
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF111618),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
                   ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        widget.testTitle, // Usar el título específico del test
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF111618),
-                        ),
+                  
+                  // Título perfectamente centrado
+                  Center(
+                    child: Text(
+                      widget.testTitle,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111618),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  
+                  // Widget invisible del mismo tamaño que el IconButton para balancear
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48, // Mismo ancho que el IconButton
+                      height: 48,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1575,33 +1602,31 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
@@ -1620,7 +1645,7 @@ class PantallaPerfil extends StatefulWidget {
 class _PantallaPerfilState extends State<PantallaPerfil> {
   int _selectedIndex = 4; // Perfil está seleccionado
 
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -1656,41 +1681,50 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Encabezado con botón de configuración
+              // Encabezado con botón de retroceso y título centrado
               Container(
                 padding: const EdgeInsets.all(16),
-                child: Row(
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      color: const Color(0xFF121617),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                    // Flecha de retroceso a la izquierda
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        color: const Color(0xFF121617),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                          );
+                        },
+                      ),
                     ),
-                    const Expanded(
-                      child: Center(
-                        child: Text(
-                          'Perfil',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF121617),
-                          ),
+                    
+                    // Título perfectamente centrado
+                    const Center(
+                      child: Text(
+                        'Perfil',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF121617),
                         ),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.settings_outlined),
-                      color: const Color(0xFF121617),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Configuración en desarrollo'),
-                            backgroundColor: Colors.blue,
-                          ),
-                        );
-                      },
+                    
+                    // Icono de configuración a la derecha
+                    const Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Icon(
+                          Icons.settings_outlined,
+                          color: Color(0xFF121617),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -1845,7 +1879,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
         ),
       ),
 
-      // Barra de navegación inferior CONSISTENTE
+      // Barra de navegación inferior CONSISTENTE CON ANIMACIÓN ORIGINAL
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(top: 8, bottom: 20),
         decoration: const BoxDecoration(
@@ -1932,33 +1966,31 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
@@ -1977,7 +2009,7 @@ class PantallaRecomendacionesCarreras extends StatefulWidget {
 class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacionesCarreras> {
   int _selectedIndex = 3; // Carreras está seleccionado
 
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -2012,31 +2044,47 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
       body: SafeArea(
         child: Column(
           children: [
-            // Encabezado con botón de retroceso
+            // Encabezado con botón de retroceso y título centrado
             Container(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    color: const Color(0xFF121617),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  // Flecha de retroceso a la izquierda
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
                   ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        'Recomendaciones de Carreras',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF121617),
-                        ),
+                  
+                  // Título perfectamente centrado
+                  const Center(
+                    child: Text(
+                      'Recomendaciones',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF121617),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  
+                  // Widget invisible del mismo tamaño que el IconButton para balancear
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48, // Mismo ancho que el IconButton
+                      height: 48,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -2047,35 +2095,47 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
                 child: Column(
                   children: [
                     _construirTarjetaCarrera(
-                      compatibilidad: '95% Compatibilidad',
-                      titulo: 'Ingeniería de Software',
-                      descripcion: 'Diseña, desarrolla y prueba aplicaciones de software. Colabora con equipos para crear soluciones innovadoras.',
-                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCmTa2J2w8KiwhBLHYqDM_U-HhJHqs0pWxWmXxAWkJb2XWCKv38ej_TjiGrbG4JD_h6cua8srjt8FWrTXlS4bNl4mWf2qRO39A0hOgTQ7kZA_L_13l0kOWvCAgvFNANY-17Rvfc2f_SPUJsqcHceYpfiIUu5bcHKAWIxUQ_8VkXfXzisPfDw1vcX3ePaiL31Fumd92fLqsydzU4Q5TDSD0QBrKa8iwAkTHR1JUjOABa7Gxj18BogNI3JsHhV--PtJPvIYkCpl0rmDNH',
+                      carrera: Carrera(
+                        nombre: 'Ingeniería de Software',
+                        compatibilidad: '95% Compatibilidad',
+                        descripcion: 'Diseña, desarrolla y prueba aplicaciones de software. Colabora con equipos para crear soluciones innovadoras.',
+                        imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCmTa2J2w8KiwhBLHYqDM_U-HhJHqs0pWxWmXxAWkJb2XWCKv38ej_TjiGrbG4JD_h6cua8srjt8FWrTXlS4bNl4mWf2qRO39A0hOgTQ7kZA_L_13l0kOWvCAgvFNANY-17Rvfc2f_SPUJsqcHceYpfiIUu5bcHKAWIxUQ_8VkXfXzisPfDw1vcX3ePaiL31Fumd92fLqsydzU4Q5TDSD0QBrKa8iwAkTHR1JUjOABa7Gxj18BogNI3JsHhV--PtJPvIYkCpl0rmDNH',
+                        portadaUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
+                      ),
                     ),
                     _construirTarjetaCarrera(
-                      compatibilidad: '92% Compatibilidad',
-                      titulo: 'Enfermería',
-                      descripcion: 'Proporciona atención directa al paciente, administra medicamentos y educa a pacientes y familias sobre el manejo de la salud.',
-                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLeo_Y0QWdhobDt-DLMRlf7LhRlZDYKViqMaUEFuSCzH22DVKtbvQon3TBkXvbGL4ANyNv39AhRewuZmFaXkG8sHxiUzplwLHoAdmW76T_C57a8TsOLMlsC9p9RQByPp9DyqIjdWO5m2zWTunCh2k7CxV2MRhfQNc8d19KlkRngtWKEQQMdAnWWM2JXiQ-E5WULk3D420bUL15YV-VtPJlBDLZXXkCcyk2d1N3j7y8Pr_aTCWyV4ZO1e3_2oQxoG7Qa_9mRcLC2A71',
+                      carrera: Carrera(
+                        nombre: 'Enfermería',
+                        compatibilidad: '92% Compatibilidad',
+                        descripcion: 'Proporciona atención directa al paciente, administra medicamentos y educa a pacientes y familias sobre el manejo de la salud.',
+                        imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLeo_Y0QWdhobDt-DLMRlf7LhRlZDYKViqMaUEFuSCzH22DVKtbvQon3TBkXvbGL4ANyNv39AhRewuZmFaXkG8sHxiUzplwLHoAdmW76T_C57a8TsOLMlsC9p9RQByPp9DyqIjdWO5m2zWTunCh2k7CxV2MRhfQNc8d19KlkRngtWKEQQMdAnWWM2JXiQ-E5WULk3D420bUL15YV-VtPJlBDLZXXkCcyk2d1N3j7y8Pr_aTCWyV4ZO1e3_2oQxoG7Qa_9mRcLC2A71',
+                        portadaUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
+                      ),
                     ),
                     _construirTarjetaCarrera(
-                      compatibilidad: '88% Compatibilidad',
-                      titulo: 'Ingeniería Mecánica',
-                      descripcion: 'Diseña y analiza sistemas mecánicos, incluyendo máquinas, motores y herramientas. Enfoque en eficiencia e innovación.',
-                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBEq1Y3_XIqaIk670m3aspVVLISiCT0mgpf0_99JfK_lOteRrueFqK4ctByh5B07cMO_bMSofJUMjrFQ1e1uOOXKM35doDIE_ktDMNwOqZYd71PZfvlQ2S5hRgsJ8lUyqdFSjthMTQ1c5OOEiNgZXM7CTPND7kHSLicpMOTu1GoZsrqk7hhZWeTwxj6CjNKxfCjMW_H-5T4tbgWTq_cZJIpiFggoqN_M35iGv08O_IvPYrRLkmov7cU-R0r8HJ0BdB18kkUMO2T7SU8',
+                      carrera: Carrera(
+                        nombre: 'Ingeniería Mecánica',
+                        compatibilidad: '88% Compatibilidad',
+                        descripcion: 'Diseña y analiza sistemas mecánicos, incluyendo máquinas, motores y herramientas. Enfoque en eficiencia e innovación.',
+                        imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBEq1Y3_XIqaIk670m3aspVVLISiCT0mgpf0_99JfK_lOteRrueFqK4ctByh5B07cMO_bMSofJUMjrFQ1e1uOOXKM35doDIE_ktDMNwOqZYd71PZfvlQ2S5hRgsJ8lUyqdFSjthMTQ1c5OOEiNgZXM7CTPND7kHSLicpMOTu1GoZsrqk7hhZWeTwxj6CjNKxfCjMW_H-5T4tbgWTq_cZJIpiFggoqN_M35iGv08O_IvPYrRLkmov7cU-R0r8HJ0BdB18kkUMO2T7SU8',
+                        portadaUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
+                      ),
                     ),
                     _construirTarjetaCarrera(
-                      compatibilidad: '85% Compatibilidad',
-                      titulo: 'Administración de Empresas',
-                      descripcion: 'Gestiona y supervisa operaciones comerciales, incluyendo marketing, finanzas y recursos humanos. Impulsa el éxito organizacional.',
-                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCXpYQX57cWaW_PH3fhFkZbRDI9yIej2zm13RCR2UF6rdjg83TPokK1_R0tSwkobQiepjuIAU2tpIYJv3lzlZPK-1lx9UrZni1waEKJkzHKtpLSrh8aLRSoe_fRJjzxZaOTbfyV1IKQ1hXCj16gpUKpenzZc9I83KRgMkSKNcSb9Jnkl7dwhrnJQxXtBWtAlQ5NL1IVqQAjxPKvScsnlWmsuNzhe2q1ybIeiRsxpkrjJoeoh8aKCVNQlIlMBgq62PFwmRRV1Un53W7k',
+                      carrera: Carrera(
+                        nombre: 'Administración de Empresas',
+                        compatibilidad: '85% Compatibilidad',
+                        descripcion: 'Gestiona y supervisa operaciones comerciales, incluyendo marketing, finanzas y recursos humanos. Impulsa el éxito organizacional.',
+                        imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCXpYQX57cWaW_PH3fhFkZbRDI9yIej2zm13RCR2UF6rdjg83TPokK1_R0tSwkobQiepjuIAU2tpIYJv3lzlZPK-1lx9UrZni1waEKJkzHKtpLSrh8aLRSoe_fRJjzxZaOTbfyV1IKQ1hXCj16gpUKpenzZc9I83KRgMkSKNcSb9Jnkl7dwhrnJQxXtBWtAlQ5NL1IVqQAjxPKvScsnlWmsuNzhe2q1ybIeiRsxpkrjJoeoh8aKCVNQlIlMBgq62PFwmRRV1Un53W7k',
+                        portadaUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
 
-            // Barra de navegación inferior CONSISTENTE
+            // Barra de navegación inferior CONSISTENTE CON ANIMACIÓN ORIGINAL
             Container(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
               decoration: const BoxDecoration(
@@ -2102,10 +2162,7 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
   }
 
   Widget _construirTarjetaCarrera({
-    required String compatibilidad,
-    required String titulo,
-    required String descripcion,
-    required String imagenUrl,
+    required Carrera carrera,
   }) {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -2123,7 +2180,7 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  compatibilidad,
+                  carrera.compatibilidad,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
@@ -2132,7 +2189,7 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  titulo,
+                  carrera.nombre,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -2141,7 +2198,7 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  descripcion,
+                  carrera.descripcion,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
@@ -2153,11 +2210,13 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
                   height: 32,
                   child: ElevatedButton(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Detalles de $titulo en desarrollo'),
-                          backgroundColor: Colors.blue,
-                          duration: const Duration(seconds: 1),
+                      // Navegar a la pantalla de detalles de la carrera
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PantallaDetallesCarrera(
+                            carrera: carrera,
+                          ),
                         ),
                       );
                     },
@@ -2192,7 +2251,7 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: NetworkImage(imagenUrl),
+                  image: NetworkImage(carrera.imagenUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -2207,33 +2266,564 @@ class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacione
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============ PANTALLA DE DETALLES DE CARRERA ============
+class PantallaDetallesCarrera extends StatelessWidget {
+  final Carrera carrera;
+  
+  const PantallaDetallesCarrera({
+    super.key,
+    required this.carrera,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Encabezado con botón de retroceso
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'Detalles de Carrera',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF121617),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 48),
+                  ],
+                ),
+              ),
+
+              // Imagen de portada
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  height: 218,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    image: DecorationImage(
+                      image: NetworkImage(carrera.portadaUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Título de la carrera
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    carrera.nombre,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Descripción
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  carrera.descripcion,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF121617),
+                    height: 1.5,
+                  ),
+                ),
+              ),
+
+              // Título: Habilidades Requeridas
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Habilidades Requeridas',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Tarjetas de habilidades
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    _construirTarjetaHabilidad(
+                      icono: Icons.code,
+                      titulo: 'Programación',
+                    ),
+                    const SizedBox(height: 12),
+                    _construirTarjetaHabilidad(
+                      icono: Icons.storage,
+                      titulo: 'Gestión de Bases de Datos',
+                    ),
+                    const SizedBox(height: 12),
+                    _construirTarjetaHabilidad(
+                      icono: Icons.gite,
+                      titulo: 'Control de Versiones',
+                    ),
+                  ],
+                ),
+              ),
+
+              // Título: Duración
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Duración',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Descripción de duración
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'Generalmente requiere una Licenciatura en Ciencias de la Computación o un campo relacionado, que toma aproximadamente 4 años completar.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF121617),
+                    height: 1.5,
+                  ),
+                ),
+              ),
+
+              // Título: Mercado Laboral
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Mercado Laboral',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Descripción del mercado laboral
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'El mercado laboral para ingenieros de software es robusto, con alta demanda en varias industrias. Las oportunidades van desde startups hasta grandes corporaciones, ofreciendo salarios competitivos y potencial de crecimiento.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF121617),
+                    height: 1.5,
+                  ),
+                ),
+              ),
+
+              // Botón "Dónde estudiar"
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navegar a la pantalla de oferta educativa
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PantallaOfertaEducativa(
+                            carrera: carrera.nombre,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1B7298),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Dónde estudiar',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Espacio para la barra de navegación
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _construirTarjetaHabilidad({
+    required IconData icono,
+    required String titulo,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFDCE2E5)),
+        color: Colors.white,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icono,
+            color: const Color(0xFF121617),
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              titulo,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF121617),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============ PANTALLA DE OFERTA EDUCATIVA ============
+class PantallaOfertaEducativa extends StatefulWidget {
+  final String carrera;
+  
+  const PantallaOfertaEducativa({
+    super.key,
+    required this.carrera,
+  });
+
+  @override
+  State<PantallaOfertaEducativa> createState() => _PantallaOfertaEducativaState();
+}
+
+class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
+  int _selectedIndex = 3; // Carreras está seleccionado (aunque estamos en una subpágina)
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) { // Inicio
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) { // Tests
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) { // Resultados
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) { // Carreras
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) { // Perfil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Encabezado con botón de retroceso
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    color: const Color(0xFF121617),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        'Oferta Educativa',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF121617),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                ],
+              ),
+            ),
+
+            // Título: Universidades e Institutos
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Universidades e Institutos',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+              ),
+            ),
+
+            // Imagen principal
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAGNk36T7u7lENmD4aoqAFegEamUZZ2-T6r-cjv8PArqrmI3jHz7Mk3rvHFZZVzyrG5knn2A-F-Q0TWYqEfHR9PB6fd68Xg-7EpmmeVaMJxc3KI6-iMri7RSRNg9gEWJ8ZbjpQQiATozleAALpByuNVRhGzrvHpXvivZgWJb9per37GnMsf7JUOKDJ6P6A23PY0K0j6XNQ8KsGgcUuAmRYg59p2x092FXGxOOOEnSBeb7NtJMvuItlUfMC59n93PQgwRUX5r3vU85y8',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+
+            // Lista de instituciones
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _construirItemInstitucion(
+                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAs6-W-VOGvkJSh-bxQCesM0fzBS9TPDhVRQObV-7hnUi-zmphJY-HuXyKS55kPKhcMF_NWdWAKFzMfZUIbUQEmOwxoRrErcv-h1atrC_zMiyteLbkQPfqRxfxhYegSS0PZTO76kk5VRqFA_IHl7QVrMGaSXdnfH5vU0qh6RsvVKZ-B2IGcc6FgncOhIGy4piX_DxEmKAeV4CIhCqbj_EULRAzZsI6Hz8611BJJOcTgw4EY_kRERpzf7ubluMngqaqK5HpCiy6uXgIX',
+                      nombre: 'Universidad Nacional del Centro del Perú',
+                      direccion: 'Av. Los Incas 123, Huancayo',
+                    ),
+                    _construirItemInstitucion(
+                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6egp3LaQ28dvND0lhsEB5D3GQS1v9TWk3U_6HF4D3WUUUcMoKCVpfWYTxOCcevRaz7bB68j70xGp5fvianqFJjrIbUro2VnD6N901az1PanxughZl7Pet8BrR0jDtx3rzWyJiSdJtodCxL1r8oBESBD886c0ZJQQjkk7-3IVEpDuxD-W-H1p45UsJjcrPuQfIuSMq8XEt5GlEH9pD3H7BrCsgWiDKGi1kdcWRebbxYZc2eEiZ7eyWowxr7f6aF78aocVpQqnxMGI1',
+                      nombre: 'Instituto Tecnológico Superior de Tarma',
+                      direccion: 'Jr. Libertad 456, Tarma',
+                    ),
+                    _construirItemInstitucion(
+                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4j-dII-gv7elTzFwt9R7rcz_Ga_AR3X56w3eGs-Fwi5SbfCz4bvZJ2ELfSCt827MTnIGJ_xfsqW7F30kw0JJmciQeoKcmOvDKhzukO-cDWR_ZLR0T7lo8AbqcGy2taYMxAVWrMytq-u8x-1jbhUaYNI5TzWMsVT4awalZU4cYnfnsh_reJsJzlwIdSehn6cpLeNytQDZw920bw5Mssr1aNkURc-zYd4dFUi-fbOItPHa_TheKT5hhL8LOvIYg2jOT-PyGrJpH4owU',
+                      nombre: 'Instituto Pedagógico de Jauja',
+                      direccion: 'Calle Real 789, Jauja',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Barra de navegación inferior CON ANIMACIÓN ORIGINAL
+            Container(
+              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF0F3F4)),
+                ),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavButton(0, Icons.home, 'Inicio'),
+                  _buildNavButton(1, Icons.list, 'Tests'),
+                  _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+                  _buildNavButton(3, Icons.work, 'Carreras'),
+                  _buildNavButton(4, Icons.person, 'Perfil'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _construirItemInstitucion({
+    required String imagenUrl,
+    required String nombre,
+    required String direccion,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      height: 72,
+      child: Row(
+        children: [
+          // Logo de la institución
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(
+                image: NetworkImage(imagenUrl),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          
+          // Información de la institución
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nombre,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF121617),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  direccion,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _navigateToTab(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -2253,7 +2843,7 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
   int _selectedIndex = 2; // Resultados está seleccionado
   final ResultManager _resultManager = ResultManager();
 
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -2267,6 +2857,11 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) { // Resultados
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
       );
     } else if (index == 3) { // Carreras
       Navigator.pushReplacement(
@@ -2290,18 +2885,48 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
       body: SafeArea(
         child: Column(
           children: [
-            // Encabezado centrado sin botón de retroceso
+            // Encabezado con botón de retroceso y título centrado
             Container(
               padding: const EdgeInsets.all(16),
-              child: const Center(
-                child: Text(
-                  'Historial de Evaluaciones',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF121617),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Flecha de retroceso a la izquierda
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
                   ),
-                ),
+                  
+                  // Título perfectamente centrado
+                  const Center(
+                    child: Text(
+                      'Historial de Evaluaciones',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF121617),
+                      ),
+                    ),
+                  ),
+                  
+                  // Widget invisible del mismo tamaño que el IconButton para balancear
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48, // Mismo ancho que el IconButton
+                      height: 48,
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -2321,7 +2946,7 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
               ),
             ),
 
-            // Lista de evaluaciones
+            // Lista de evaluaciones (LOS 3 PREDETERMINADOS)
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -2335,7 +2960,7 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
               ),
             ),
 
-            // Barra de navegación inferior CONSISTENTE
+            // Barra de navegación inferior CONSISTENTE CON ANIMACIÓN ORIGINAL
             Container(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
               decoration: const BoxDecoration(
@@ -2441,33 +3066,31 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
