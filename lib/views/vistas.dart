@@ -1,78 +1,12 @@
+// ============================================================================
+// VISTAS - Widgets de interfaz de usuario
+// ============================================================================
+
 import 'package:flutter/material.dart';
+import '../models/models.dart';
+import '../controllers/controllers.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Stitch Career',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Epilogue',
-        useMaterial3: true,
-      ),
-      home: const LoginScreen(),
-    );
-  }
-}
-
-// ============ MODELO PARA RESULTADOS ============
-class TestResult {
-  final String testType;
-  final String testTitle;
-  final DateTime completionDate;
-  
-  TestResult({
-    required this.testType,
-    required this.testTitle,
-    required this.completionDate,
-  });
-  
-  // Formatear la fecha como "15-01-2024"
-  String get formattedDate {
-    return "${completionDate.day.toString().padLeft(2, '0')}-${completionDate.month.toString().padLeft(2, '0')}-${completionDate.year}";
-  }
-}
-
-// ============ GESTOR DE RESULTADOS ============
-class ResultManager {
-  static final ResultManager _instance = ResultManager._internal();
-  
-  factory ResultManager() {
-    return _instance;
-  }
-  
-  ResultManager._internal();
-  
-  // Lista de resultados recientes - INICIALMENTE VACÍA
-  List<TestResult> _recentResults = [];
-  
-  // Método para agregar un nuevo resultado
-  void addResult(String testType, String testTitle) {
-    _recentResults.insert(0, TestResult(
-      testType: testType,
-      testTitle: testTitle,
-      completionDate: DateTime.now(),
-    ));
-    
-    // Mantener solo los últimos 5 resultados
-    if (_recentResults.length > 5) {
-      _recentResults = _recentResults.sublist(0, 5);
-    }
-  }
-  
-  // Método para obtener todos los resultados
-  List<TestResult> getRecentResults() {
-    return List.from(_recentResults);
-  }
-}
-
-// ============ PANTALLA DE LOGIN ============
+// ---------- Pantalla de Login ----------
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -85,65 +19,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  // Credenciales válidas
-  final List<String> _validEmails = [
-    'usuario@gmail.com',
-    'correo@hotmail.com',
-    'email@outlook.com',
-    'test@yahoo.com',
-    'admin@example.com'
-  ];
-  final String _validPassword = 'password123';
+  final AuthController _authController = AuthController();
 
   void _login() {
     if (_formKey.currentState!.validate()) {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
 
-      // Verificar credenciales
-      bool isValidEmail = _validEmails.contains(email);
-      bool isValidPassword = password == _validPassword;
-
-      if (isValidEmail && isValidPassword) {
-        // Navegar a la pantalla principal
+      if (_authController.validateCredentials(email, password)) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
         );
       } else {
-        // Mostrar mensaje de error
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Credenciales incorrectas. Intenta con: usuario@gmail.com y password123'),
+          SnackBar(
+            content: Text(_authController.getErrorMessage(email, password)),
             backgroundColor: Colors.red,
           ),
         );
       }
     }
-  }
-
-  // Validar formato de email
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu correo electrónico';
-    }
-    
-    // Validar formato básico de email
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Por favor ingresa un correo electrónico válido';
-    }
-    
-    return null;
-  }
-
-  // Validar contraseña
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu contraseña';
-    }
-    return null;
   }
 
   @override
@@ -158,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Título
                 const SizedBox(height: 20),
                 const Text(
                   'Iniciar sesión',
@@ -176,20 +71,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.grey,
                   ),
                 ),
-
-                // Formulario
                 const SizedBox(height: 40),
                 _buildTextField(
                   label: 'Correo electrónico',
                   hint: 'usuario@gmail.com',
                   controller: _emailController,
                   isPassword: false,
-                  validator: _validateEmail,
+                  validator: _authController.validateEmail,
                 ),
                 const SizedBox(height: 20),
                 _buildPasswordField(),
-
-                // Botón de ingresar
                 const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
@@ -211,8 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-
-                // Enlace para crear cuenta
                 const Spacer(),
                 Center(
                   child: Row(
@@ -335,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextFormField(
                   controller: _passwordController,
                   obscureText: !_showPassword,
-                  validator: _validatePassword,
+                  validator: _authController.validatePassword,
                   decoration: const InputDecoration(
                     hintText: 'password123',
                     border: InputBorder.none,
@@ -362,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// ============ PANTALLA PRINCIPAL (HOME) ============
+// ---------- Pantalla Principal ----------
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({super.key});
 
@@ -375,29 +264,30 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   bool _isTestHovered = false;
   final ResultManager _resultManager = ResultManager();
 
-  // Navegación entre pantallas
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
     
-    if (index == 1) { // Tests
-      Navigator.push(
+    if (index == 1) {
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TestsScreen()),
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
       );
-    } else if (index == 4) { // Perfil
-      Navigator.push(
+    } else if (index == 2) {
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
       );
-    } else if (index >= 2 && index <= 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Funcionalidad en desarrollo'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 1),
-        ),
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPerfil()),
       );
     }
   }
@@ -417,14 +307,13 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             ),
             child: Column(
               children: [
-                // Header con avatar y título
                 Container(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
                       CircleAvatar(
                         backgroundImage: NetworkImage(
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuA4DO2yOPKDC3cmgRmFZfQSRFTl_aXnrY2YXTK7Kr1I7yy-nmSTFjnhMsvLB3saicwJIt4z8DwMoixOC_Kg5V_I3L1eokXg8Aii7j0VeXyETMGIiHpwGauh__wCuZdknh9aFD9cuJOC6kJhCNkEMBuVFoc-Ysa5o4L2hN20qpqC6ID3zCPEHevyMdhFCUBFKXDH7nh7aGO8towkzUYJeBLaa0l2hv-RC8wlRZGZWcLh0V3P5cQPLE4Tfazb4jMFeL87O9lGkx2HyqlS',
+                          'https://lh3.googleusercontent.com/aida-public/AB6AXuA4DO2yOPKDC3cmgRmFZfQSRFTl_aXnrY2YXTK7Kr1I7yy-nmSTFjnhMsvLB3saicwJIt4z8DwMoixOC_Kg5V_I3L1eokXg8Aii7j0VeXyHpwGauh__wCuZdETMGIiknh9aFD9cuJOC6kJhCNkEMBuVFoc-Ysa5o4L2hN20qpqC6ID3zCPEHevyMdhFCUBFKXDH7nh7aGO8towkzUYJeBLaa0l2hv-RC8wlRZGZWcLh0V3P5cQPLE4Tfazb4jMFeL87O9lGkx2HyqlS',
                         ),
                         radius: 20,
                       ),
@@ -435,7 +324,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF121617),
                             ),
                           ),
                         ),
@@ -444,8 +332,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                     ],
                   ),
                 ),
-
-                // Saludo
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -460,11 +346,9 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // Nueva sección de test
                       InkWell(
                         onTap: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => const TestsScreen()),
                           );
@@ -482,7 +366,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                             color: Colors.white,
                             border: Border.all(
                               color: _isTestHovered
-                                  ? const Color(0xFF0052FF).withOpacity(0.3)
+                                  ? const Color(0xFF0052FF).withValues(alpha: 0.3)
                                   : Colors.transparent,
                               width: 2,
                             ),
@@ -544,8 +428,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                     ],
                   ),
                 ),
-
-                // Carreras destacadas
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   child: Column(
@@ -560,31 +442,44 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                         ),
                       ),
                       const SizedBox(height: 12),
-
-                      // Lista horizontal de carreras
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: [
                             _buildCareerCard(
-                              imageUrl:
-                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuCcIFpt9OxmhsqKarIdcM7hoFrWzUDCg1xFqSt5E5MpJoivKeT9RBV4HGoH4jmEqGmbL-7r-NUtMEJkvyqfohyofUdBAk0BHntMQ7MwLVrG1f9NbHe_3gFPMsFh94Xw9H1WCVe97098iAS1mOqUnS_mY7rGjacz_dfxK0dHPyHlNUpS-f7ENAAFdd3NOM9BRu-j6-QL9XcaicmkNelkym1zfa3b6WefMgSJavT4WwsgRSOi5LeN6q9f0OyYxui3ZBAHk6Vqsc5zCvnk',
+                              imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCcIFpt9OxmhsqKarIdcM7hoFrWzUDCg1xFqSt5E5MpJoivKeT9RBV4HGoH4jmEqGmbL-7r-NUtMEJkvyqfohyofUdBAk0BHntMQ7MwLVrG1f9NbHe_3gFPMsFh94Xw9H1WCVe97098iAS1mOqUnS_mY7rGjacz_dfxK0dHPyHlNUpS-f7ENAAFdd3NOM9BRu-j6-QL9XcaicmkNelkym1zfa3b6WefMgSJavT4WwsgRSOi5LeN6q9f0OyYxui3ZBAHk6Vqsc5zCvnk',
                               title: 'Médico',
                               description: 'Profesional de la salud',
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                                );
+                              },
                             ),
                             const SizedBox(width: 12),
                             _buildCareerCard(
-                              imageUrl:
-                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuBFr1zXdezl1vxFCR7qgHvXVKJJWc6vDf7s_J57A16RMKXIUSq-XD506NmAUhSuVqOwHe1u18Wjc-Atdc599WvvzwLcKt-WEGDS-B3bQUuWf4EsHft0RRS8JBoGEvB9PubKZYQ9_4B3qhj7z16aIhdIBxTauXFcpz4yttdHm3DP-4A7wgaVNcOMyNq4DMswYkJ5lhY_pnzsa66mJ3FyeJQaA9rt0h0nJ3Np2PmRIKinucgmnfajN1-9U8GfIrYFJW1KX1gm58YlNDHh',
+                              imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBFr1zXdezl1vxFCR7qgHvXVKJJWc6vDf7s_J57A16RMKXIUSq-XD506NmAUhSuVqOwHe1u18Wjc-Atdc599WvvzwLcKt-WEGDS-B3bQUuWf4EsHft0RRS8JBoGEvB9PubKZYQ9_4B3qhj7z16aIhdIBxTauXFcpz4yttdHm3DP-4A7wgaVNcOMyNq4DMswYkJ5lhY_pnzsa66mJ3FyeJQaA9rt0h0nJ3Np2PmRIKinucgmnfajN1-9U8GfIrYFJW1KX1gm58YlNDHh',
                               title: 'Ingeniero',
                               description: 'Diseña y construye',
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                                );
+                              },
                             ),
                             const SizedBox(width: 12),
                             _buildCareerCard(
-                              imageUrl:
-                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuCJFbJLYCEDTWyD5rsxe5XbxVibQ56a9Sr0d1kWBApS1KEzxwb6Zz2xRI6OFrK8USKu5qF8M-_R1EHd-oC-ddwceYOxuQ3uMy4Mro7zJ_Tjur5dvxZ0CJJFfKRDL9jed5xZK8Zrr8Qvedt6EJp1I1NJd5ONPiSIp-diRdEAhgrJ7aIJql0Xe2XZIhu1ZXXvNbVQA6RhXHJu1jWx2ItqPDp8b9OHpRKv7RhPIMUFaJhq86nX02O2itQnCScU4qWzLjtc8OfcrY37I95n',
+                              imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCJFbJLYCEDTWyD5rsxe5XbxVibQ56a9Sr0d1kWBApS1KEzxwb6Zz2xRI6OFrK8USKu5qF8M-_R1EHd-oC-ddwceYOxuQ3uMy4Mro7zJ_Tjur5dvxZ0CJJFfKRDL9jed5xZK8Zrr8Qvedt6EJp1I1NJd5ONPiSIp-diRdEAhgrJ7aIJql0Xe2XZIhu1ZXXvNbVQA6RhXHJu1jWx2ItqPDp8b9OHpRKv7RhPIMUFaJhq86nX02O2itQnCScU4qWzLjtc8OfcrY37I95n',
                               title: 'Arquitecto',
                               description: 'Crea diseños de edificios',
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -592,8 +487,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                     ],
                   ),
                 ),
-
-                // Últimos resultados
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -608,8 +501,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                         ),
                       ),
                       const SizedBox(height: 12),
-
-                      // Lista de resultados - SIEMPRE mostrar el mensaje cuando no hay resultados
                       if (recentResults.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 20),
@@ -636,7 +527,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                   fontSize: 14,
                                   color: Color(0xFF657C86),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -650,15 +540,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 40),
               ],
             ),
           ),
         ),
       ),
-
-      // Barra de navegación inferior
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(top: 8, bottom: 20),
         decoration: const BoxDecoration(
@@ -682,62 +569,51 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   }
 
   Widget _buildResultCard(TestResult result) {
-    return InkWell(
-      onTap: () {
-        print('Resultado de ${result.testType} presionado');
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xFFF0F3F4),
-              ),
-              child: const Icon(
-                Icons.bar_chart,
-                color: Color(0xFF121617),
-              ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFF0F3F4),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    result.testTitle,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF121617),
-                    ),
-                  ),
-                  Text(
-                    'Completado el ${result.formattedDate}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF657C86),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
+            child: const Icon(
+              Icons.bar_chart,
               color: Color(0xFF121617),
-              size: 20,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  result.testTitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+                Text(
+                  'Completado el ${result.formattedDate}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF657C86),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -746,6 +622,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     required String imageUrl,
     required String title,
     required String description,
+    required VoidCallback onTap,
   }) {
     return SizedBox(
       width: 150,
@@ -753,9 +630,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            onTap: () {
-              print('Carrera $title seleccionada');
-            },
+            onTap: onTap,
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: 150,
@@ -795,35 +670,31 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected
-                  ? const Color(0xFF0052FF).withOpacity(0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
@@ -831,7 +702,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   }
 }
 
-// ============ PANTALLA DE TESTS ============
+// ---------- Tests Screen ----------
 class TestsScreen extends StatefulWidget {
   const TestsScreen({super.key});
 
@@ -840,30 +711,33 @@ class TestsScreen extends StatefulWidget {
 }
 
 class _TestsScreenState extends State<TestsScreen> {
-  int _selectedIndex = 1; // Tests está seleccionado por defecto
+  int _selectedIndex = 1;
+  final TestsController _testsController = TestsController();
 
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
     
-    if (index == 0) { // Inicio
+    if (index == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
       );
-    } else if (index == 4) { // Perfil
+    } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
       );
-    } else if (index >= 2 && index <= 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Funcionalidad en desarrollo'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 1),
-        ),
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPerfil()),
       );
     }
   }
@@ -882,6 +756,8 @@ class _TestsScreenState extends State<TestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tests = _testsController.getAvailableTests();
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -889,60 +765,68 @@ class _TestsScreenState extends State<TestsScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    color: const Color(0xFF111618),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF111618),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
                   ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        'Tests',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF111618),
-                        ),
+                  const Center(
+                    child: Text(
+                      'Tests',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111618),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                    ),
+                  ),
                 ],
               ),
             ),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
                     _buildTestCard(
-                      category: 'Intereses Vocacionales',
-                      title: 'Descubre Tu Pasión',
-                      description: 'Explora carreras alineadas con tus intereses y pasiones.',
-                      imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB1EDx4Ly3T3eE-pK-GoFg9aqAsDQGarLGTEKfSslbhTk046A7g5ka9FOussvOzLhd-u70PmCaozOR3JGlUmsY0tq7EoR3MaDd8NUmqqyX4eAR030Wg-k8urTeCWVrCF1D3EUwHq1UqOPkwJqjMdepMq3VZ0dnVWKS8Pjw6hVKiccsZgRxAE2AVOjEvHcwZhi06opm7EzyFsxTgL1uDmcVmGspUEUatbi4Pf75-kcX-h7q7d58JTH3a5Nz4LOUv_23BcAFJ-UK64Yl0',
+                      category: tests[0]['category']!,
+                      title: tests[0]['title']!,
+                      description: tests[0]['description']!,
+                      imageUrl: tests[0]['imageUrl']!,
                       onTap: () => _navigateToTest('Intereses Vocacionales', 'Test de Intereses'),
                     ),
                     const SizedBox(height: 16),
-
                     _buildTestCard(
-                      category: 'Aptitudes',
-                      title: 'Descubre Tus Fortalezas',
-                      description: 'Identifica tus talentos naturales y habilidades para encontrar caminos profesionales adecuados.',
-                      imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUnQmCqYGAalEH844C6WJmOI9hOwBm7qLPbZdEOEN1rbIESN-C2DZB6gm7PT5x4hi_9-x9IRq2XldbOpkJToL2Vmltf7f_s_wSBFqNIPSrZL0CMiuK2D1JGaFxhxBOz04jy3nVuGuPDSlKXUnumAYLcutVfhw7BfnrJ64TgU3uvm0RQHbJZhV4Z28eFXtNCVNM7VaQe3ehHCepeQML2DsYJYRmPCuD0-IXNgvnRnG5NnBLbf-WDWSK5UjHZSuMCkj-8fRbtU1dMNXW',
+                      category: tests[1]['category']!,
+                      title: tests[1]['title']!,
+                      description: tests[1]['description']!,
+                      imageUrl: tests[1]['imageUrl']!,
                       onTap: () => _navigateToTest('Aptitudes', 'Test de Aptitudes'),
                     ),
                     const SizedBox(height: 16),
-
                     _buildTestCard(
-                      category: 'Personalidad',
-                      title: 'Conoce Tu Verdadero Yo',
-                      description: 'Comprende tus rasgos de personalidad y cómo se adaptan a diferentes profesiones.',
-                      imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCF_N0UNsQaHoperFMXs7Q2wlfVn-WGy4gefWoL0ztTQ9Eu_nxSfp6rX5gVtiMQU8TIwBySIvlVu7fYTmMQImoeAvIV6yhRhC9RoAnvnLvU_2CP3kL8gjqeP_gcGRZl5TLbWLyUxrjHQ_TFSsI53DONKW49FkhMjYcA0TQtGm09eROfecYtiKVPZIgH63MoFqb45BLoE87DG1-mrDVpGfztbYjQjJHp_UBDuUEXoN7-BwhskyDwUXmRGy3kRKen3Rg3C4X7tWjlGPwI',
+                      category: tests[2]['category']!,
+                      title: tests[2]['title']!,
+                      description: tests[2]['description']!,
+                      imageUrl: tests[2]['imageUrl']!,
                       onTap: () => _navigateToTest('Personalidad', 'Test de Personalidad'),
                     ),
                     const SizedBox(height: 20),
@@ -950,7 +834,6 @@ class _TestsScreenState extends State<TestsScreen> {
                 ),
               ),
             ),
-
             Container(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
               decoration: const BoxDecoration(
@@ -1061,33 +944,31 @@ class _TestsScreenState extends State<TestsScreen> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
@@ -1095,11 +976,11 @@ class _TestsScreenState extends State<TestsScreen> {
   }
 }
 
-// ============ PANTALLA DE PREGUNTAS DEL TEST ============
+// ---------- Test Questions Screen ----------
 class TestQuestionsScreen extends StatefulWidget {
   final String testType;
   final String testTitle;
-  
+   
   const TestQuestionsScreen({
     super.key,
     required this.testType,
@@ -1111,47 +992,42 @@ class TestQuestionsScreen extends StatefulWidget {
 }
 
 class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
-  int _selectedIndex = 1; // Tests está seleccionado
+  int _selectedIndex = 1;
   int _selectedOption = 0;
   int _currentQuestion = 1;
   final int _totalQuestions = 10;
   final ResultManager _resultManager = ResultManager();
+  final TestsController _testsController = TestsController();
 
-  final List<String> _options = [
-    'Totalmente en desacuerdo',
-    'En desacuerdo',
-    'Neutral',
-    'De acuerdo',
-    'Totalmente de acuerdo',
-  ];
-
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
     
-    if (index == 0) { // Inicio
+    if (index == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
       );
-    } else if (index == 1) { // Tests
+    } else if (index == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const TestsScreen()),
       );
-    } else if (index == 4) { // Perfil
+    } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
       );
-    } else if (index >= 2 && index <= 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Funcionalidad en desarrollo'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 1),
-        ),
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPerfil()),
       );
     }
   }
@@ -1169,10 +1045,8 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
         _selectedOption = 0;
       });
     } else {
-      // TEST COMPLETADO
       _resultManager.addResult(widget.testType, widget.testTitle);
-      
-      // SOLO mostrar el mensaje sin botón "Ver Resultados"
+       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('¡${widget.testTitle} completado!'),
@@ -1180,9 +1054,9 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
           duration: const Duration(seconds: 2),
         ),
       );
-      
-      // Navegar de vuelta a la pantalla principal
+       
       Future.delayed(const Duration(seconds: 2), () {
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
@@ -1209,32 +1083,42 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    color: const Color(0xFF111618),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF111618),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
                   ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        widget.testTitle, // Usar el título específico del test
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF111618),
-                        ),
+                  Center(
+                    child: Text(
+                      widget.testTitle,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111618),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                    ),
+                  ),
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -1273,14 +1157,12 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  // Pregunta dinámica basada en el tipo de test
-                  _getQuestionForTest(widget.testType, _currentQuestion),
+                  _testsController.getQuestionForTest(widget.testType, _currentQuestion),
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -1289,16 +1171,15 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
                 ),
               ),
             ),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
-                  children: List.generate(_options.length, (index) {
+                  children: List.generate(_testsController.options.length, (index) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: _buildOptionCard(
-                        text: _options[index],
+                        text: _testsController.options[index],
                         isSelected: _selectedOption == index,
                         onTap: () => _selectOption(index),
                       ),
@@ -1307,7 +1188,6 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
                 ),
               ),
             ),
-
             Container(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -1331,7 +1211,7 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
                               fontWeight: FontWeight.bold,
                               color: _currentQuestion > 1
                                   ? const Color(0xFF111618)
-                                  : const Color(0xFF111618).withOpacity(0.5),
+                                  : const Color(0xFF111618).withValues(alpha: 0.5),
                             ),
                           ),
                         ),
@@ -1367,7 +1247,6 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
                 ],
               ),
             ),
-
             Container(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
               decoration: const BoxDecoration(
@@ -1389,67 +1268,6 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
         ),
       ),
     );
-  }
-
-  String _getQuestionForTest(String testType, int questionNumber) {
-    switch (testType) {
-      case 'Intereses Vocacionales':
-        return _getInteresVocacionalQuestion(questionNumber);
-      case 'Aptitudes':
-        return _getAptitudesQuestion(questionNumber);
-      case 'Personalidad':
-        return _getPersonalidadQuestion(questionNumber);
-      default:
-        return '¿Cómo te sientes acerca de esta actividad?';
-    }
-  }
-
-  String _getInteresVocacionalQuestion(int number) {
-    final questions = [
-      '¿Disfrutas diseñando gráficos digitales?',
-      '¿Te gusta investigar temas científicos?',
-      '¿Te interesa ayudar a personas con problemas?',
-      '¿Disfrutas trabajando con números y datos?',
-      '¿Te gusta crear contenido artístico?',
-      '¿Te interesan las máquinas y la tecnología?',
-      '¿Disfrutas organizando eventos?',
-      '¿Te gusta enseñar a otras personas?',
-      '¿Te interesa el mundo de los negocios?',
-      '¿Disfrutas analizando problemas complejos?',
-    ];
-    return questions[number - 1];
-  }
-
-  String _getAptitudesQuestion(int number) {
-    final questions = [
-      '¿Te resulta fácil resolver problemas matemáticos complejos?',
-      '¿Tienes buena memoria para recordar detalles?',
-      '¿Eres hábil con las herramientas manuales?',
-      '¿Tienes facilidad para aprender idiomas?',
-      '¿Eres bueno identificando patrones?',
-      '¿Tienes buena coordinación mano-ojo?',
-      '¿Eres bueno expresándote por escrito?',
-      '¿Tienes facilidad para entender mapas?',
-      '¿Eres bueno trabajando bajo presión?',
-      '¿Tienes habilidad para negociar?',
-    ];
-    return questions[number - 1];
-  }
-
-  String _getPersonalidadQuestion(int number) {
-    final questions = [
-      '¿Prefieres trabajar en equipo que individualmente?',
-      '¿Te consideras una persona extrovertida?',
-      '¿Eres meticuloso con los detalles?',
-      '¿Te gusta tomar riesgos?',
-      '¿Eres paciente con los demás?',
-      '¿Prefieres seguir instrucciones que dar órdenes?',
-      '¿Te adaptas fácilmente a cambios?',
-      '¿Eres bueno manejando el estrés?',
-      '¿Prefieres rutinas establecidas?',
-      '¿Te gusta tomar decisiones rápidas?',
-    ];
-    return questions[number - 1];
   }
 
   Widget _buildOptionCard({
@@ -1520,33 +1338,31 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
           ),
         ],
       ),
@@ -1554,7 +1370,7 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
   }
 }
 
-// ============ PANTALLA DE PERFIL ============
+// ---------- Pantalla Perfil ----------
 class PantallaPerfil extends StatefulWidget {
   const PantallaPerfil({super.key});
 
@@ -1563,30 +1379,32 @@ class PantallaPerfil extends StatefulWidget {
 }
 
 class _PantallaPerfilState extends State<PantallaPerfil> {
-  int _selectedIndex = 4; // Perfil está seleccionado
+  int _selectedIndex = 4;
 
-  void _onItemTapped(int index) {
+  void _navigateToTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
     
-    if (index == 0) { // Inicio
+    if (index == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
       );
-    } else if (index == 1) { // Tests
+    } else if (index == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const TestsScreen()),
       );
-    } else if (index >= 2 && index <= 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Funcionalidad en desarrollo'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 1),
-        ),
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
       );
     }
   }
@@ -1599,52 +1417,52 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Encabezado con botón de configuración
               Container(
                 padding: const EdgeInsets.all(16),
-                child: Row(
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      color: const Color(0xFF121617),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        color: const Color(0xFF121617),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                          );
+                        },
+                      ),
                     ),
-                    const Expanded(
-                      child: Center(
-                        child: Text(
-                          'Perfil',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF121617),
-                          ),
+                    const Center(
+                      child: Text(
+                        'Perfil',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF121617),
                         ),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.settings_outlined),
-                      color: const Color(0xFF121617),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Configuración en desarrollo'),
-                            backgroundColor: Colors.blue,
-                          ),
-                        );
-                      },
+                    const Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Icon(
+                          Icons.settings_outlined,
+                          color: Color(0xFF121617),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-
-              // Información del usuario
               Container(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // Foto de perfil
                     Container(
                       width: 128,
                       height: 128,
@@ -1659,7 +1477,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Nombre
                     const Text(
                       'Mateo Vargas',
                       style: TextStyle(
@@ -1669,7 +1486,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Ocupación
                     const Text(
                       'Estudiante',
                       style: TextStyle(
@@ -1678,7 +1494,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                         color: Color(0xFF657C86),
                       ),
                     ),
-                    // Ubicación
                     const Text(
                       'Junín, Perú',
                       style: TextStyle(
@@ -1690,8 +1505,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   ],
                 ),
               ),
-
-              // Título: Información Personal
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Align(
@@ -1706,22 +1519,16 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   ),
                 ),
               ),
-
-              // Email
               _construirItemInformacion(
                 icono: Icons.email_outlined,
                 titulo: 'Email',
                 valor: 'mateo.vargas@email.com',
               ),
-
-              // Teléfono
               _construirItemInformacion(
                 icono: Icons.phone_outlined,
                 titulo: 'Teléfono',
                 valor: '+51 987 654 321',
               ),
-
-              // Título: Información Académica
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Align(
@@ -1736,22 +1543,16 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   ),
                 ),
               ),
-
-              // Colegio
               _construirItemInformacion(
                 icono: Icons.school_outlined,
                 titulo: 'Colegio',
                 valor: 'Colegio Nacional San José',
               ),
-
-              // Grado
               _construirItemInformacion(
                 icono: Icons.menu_book_outlined,
                 titulo: 'Grado',
                 valor: '5to año de secundaria',
               ),
-
-              // Botón Cerrar Sesión
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: SizedBox(
@@ -1781,14 +1582,11 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-
-      // Barra de navegación inferior CONSISTENTE
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(top: 8, bottom: 20),
         decoration: const BoxDecoration(
@@ -1821,7 +1619,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
       height: 72,
       child: Row(
         children: [
-          // Icono
           Container(
             width: 48,
             height: 48,
@@ -1836,8 +1633,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             ),
           ),
           const SizedBox(width: 16),
-          
-          // Información
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1875,33 +1670,1006 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? 50 : 40,
-            height: isSelected ? 50 : 40,
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0052FF).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(isSelected ? 25 : 20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
               icon,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
-              size: isSelected ? 26 : 24,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
             ),
           ),
           const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+          Text(
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            child: Text(label),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------- Pantalla Recomendaciones Carreras ----------
+class PantallaRecomendacionesCarreras extends StatefulWidget {
+  const PantallaRecomendacionesCarreras({super.key});
+
+  @override
+  State<PantallaRecomendacionesCarreras> createState() => _PantallaRecomendacionesCarrerasState();
+}
+
+class _PantallaRecomendacionesCarrerasState extends State<PantallaRecomendacionesCarreras> {
+  int _selectedIndex = 3;
+  final CarrerasController _carrerasController = CarrerasController();
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPerfil()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final carreras = _carrerasController.getCarreras();
+    
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      'Recomendaciones',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF121617),
+                      ),
+                    ),
+                  ),
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: carreras.map((carrera) {
+                    return _construirTarjetaCarrera(carrera: carrera);
+                  }).toList(),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF0F3F4)),
+                ),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavButton(0, Icons.home, 'Inicio'),
+                  _buildNavButton(1, Icons.list, 'Tests'),
+                  _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+                  _buildNavButton(3, Icons.work, 'Carreras'),
+                  _buildNavButton(4, Icons.person, 'Perfil'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _construirTarjetaCarrera({required Carrera carrera}) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  carrera.compatibilidad,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  carrera.nombre,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  carrera.descripcion,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 32,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PantallaDetallesCarrera(carrera: carrera),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF0F3F4),
+                      foregroundColor: const Color(0xFF121617),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    child: const Text(
+                      'Ver Detalles',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 1,
+            child: Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  image: NetworkImage(carrera.imagenUrl),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _navigateToTab(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------- Pantalla Detalles Carrera ----------
+class PantallaDetallesCarrera extends StatelessWidget {
+  final Carrera carrera;
+   
+  const PantallaDetallesCarrera({super.key, required this.carrera});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'Detalles de Carrera',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF121617),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 48),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  height: 218,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    image: DecorationImage(
+                      image: NetworkImage(carrera.portadaUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    carrera.nombre,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  carrera.descripcion,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF121617),
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Habilidades Requeridas',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    _construirTarjetaHabilidad(
+                      icono: Icons.code,
+                      titulo: 'Programación',
+                    ),
+                    const SizedBox(height: 12),
+                    _construirTarjetaHabilidad(
+                      icono: Icons.storage,
+                      titulo: 'Gestión de Bases de Datos',
+                    ),
+                    const SizedBox(height: 12),
+                    _construirTarjetaHabilidad(
+                      icono: Icons.gite,
+                      titulo: 'Control de Versiones',
+                    ),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Duración',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'Generalmente requiere una Licenciatura en Ciencias de la Computación o un campo relacionado, que toma aproximadamente 4 años completar.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF121617),
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Mercado Laboral',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121617),
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'El mercado laboral para ingenieros de software es robusto, con alta demanda en varias industrias. Las oportunidades van desde startups hasta grandes corporaciones, ofreciendo salarios competitivos y potencial de crecimiento.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF121617),
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PantallaOfertaEducativa(carrera: carrera.nombre),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1B7298),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Dónde estudiar',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _construirTarjetaHabilidad({required IconData icono, required String titulo}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFFDCE2E5)),
+        color: Colors.white,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icono,
+            color: Color(0xFF121617),
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              titulo,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF121617),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------- Pantalla Oferta Educativa ----------
+class PantallaOfertaEducativa extends StatefulWidget {
+  final String carrera;
+   
+  const PantallaOfertaEducativa({super.key, required this.carrera});
+
+  @override
+  State<PantallaOfertaEducativa> createState() => _PantallaOfertaEducativaState();
+}
+
+class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
+  int _selectedIndex = 3;
+  final CarrerasController _carrerasController = CarrerasController();
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPerfil()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final instituciones = _carrerasController.getInstituciones();
+    
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    color: const Color(0xFF121617),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        'Oferta Educativa',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF121617),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Universidades e Institutos',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAGNk36T7u7lENmD4aoqAFegEamUZZ2-T6r-cjv8PArqrmI3jHz7Mk3rvHFZZVzyrG5knn2A-F-Q0TWYqEfHR9PB6fd68Xg-7EpmmeVaMJxc3KI6-iMri7RSRNg9gEWJ8ZbjpQQiATozleAALpByuNVRhGzrvHpXvivZgWJb9per37GnMsf7JUOKDJ6P6A23PY0K0j6XNQ8KsGgcUuAmRYg59p2x092FXGxOOOEnSBeb7NtJMvuItlUfMC59n93PQgwRUX5r3vU85y8',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: instituciones.map((institucion) {
+                    return _construirItemInstitucion(
+                      imagenUrl: institucion['imagenUrl']!,
+                      nombre: institucion['nombre']!,
+                      direccion: institucion['direccion']!,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF0F3F4)),
+                ),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavButton(0, Icons.home, 'Inicio'),
+                  _buildNavButton(1, Icons.list, 'Tests'),
+                  _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+                  _buildNavButton(3, Icons.work, 'Carreras'),
+                  _buildNavButton(4, Icons.person, 'Perfil'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _construirItemInstitucion({
+    required String imagenUrl,
+    required String nombre,
+    required String direccion,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      height: 72,
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(
+                image: NetworkImage(imagenUrl),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nombre,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF121617),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  direccion,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _navigateToTab(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------- Pantalla Historial Evaluaciones ----------
+class PantallaHistorialEvaluaciones extends StatefulWidget {
+  const PantallaHistorialEvaluaciones({super.key});
+
+  @override
+  State<PantallaHistorialEvaluaciones> createState() => _PantallaHistorialEvaluacionesState();
+}
+
+class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluaciones> {
+  int _selectedIndex = 2;
+  final ResultManager _resultManager = ResultManager();
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPerfil()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final completedEvaluations = _resultManager.getCompletedEvaluations();
+    
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF121617),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                        );
+                      },
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      'Historial de Evaluaciones',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF121617),
+                      ),
+                    ),
+                  ),
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Evaluaciones Completadas',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF121617),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: completedEvaluations.map((evaluacion) {
+                    return _construirItemEvaluacion(
+                      titulo: evaluacion['titulo']!,
+                      perfilPrincipal: evaluacion['perfilPrincipal']!,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF0F3F4)),
+                ),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavButton(0, Icons.home, 'Inicio'),
+                  _buildNavButton(1, Icons.list, 'Tests'),
+                  _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+                  _buildNavButton(3, Icons.work, 'Carreras'),
+                  _buildNavButton(4, Icons.person, 'Perfil'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _construirItemEvaluacion({
+    required String titulo,
+    required String perfilPrincipal,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 72,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  titulo,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF121617),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  perfilPrincipal,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF657C86),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 32,
+            child: ElevatedButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Resultados de $titulo en desarrollo'),
+                    backgroundColor: Colors.blue,
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFF0F3F4),
+                foregroundColor: const Color(0xFF121617),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              child: const Text(
+                'Ver Resultados',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _navigateToTab(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            ),
           ),
         ],
       ),
