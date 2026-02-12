@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
-import '../models/result_manager.dart';
+import '../viewmodels/viewmodels.dart';
 import 'views.dart';
 
 class PantallaHistorialEvaluaciones extends StatefulWidget {
   const PantallaHistorialEvaluaciones({super.key});
 
   @override
-  State<PantallaHistorialEvaluaciones> createState() => _PantallaHistorialEvaluacionesState();
+  State<PantallaHistorialEvaluaciones> createState() =>
+      _PantallaHistorialEvaluacionesState();
 }
 
-class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluaciones> {
-  int _selectedIndex = 2;
-  final ResultManager _resultManager = ResultManager();
+class _PantallaHistorialEvaluacionesState
+    extends State<PantallaHistorialEvaluaciones> {
+  final HistorialEvaluacionesViewModel _viewModel =
+      HistorialEvaluacionesViewModel();
 
   void _navigateToTab(int index) {
-    if (index == _selectedIndex) return;
-    
-    setState(() {
-      _selectedIndex = index;
-    });
-    
+    if (index == _viewModel.selectedIndex) return;
+
     if (index == 0) {
       Navigator.pushReplacement(
         context,
@@ -33,12 +31,14 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+        MaterialPageRoute(
+            builder: (context) => const PantallaHistorialEvaluaciones()),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+        MaterialPageRoute(
+            builder: (context) => const PantallaRecomendacionesCarreras()),
       );
     } else if (index == 4) {
       Navigator.pushReplacement(
@@ -50,8 +50,8 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
 
   @override
   Widget build(BuildContext context) {
-    final completedEvaluations = _resultManager.getCompletedEvaluations();
-    
+    final completedEvaluations = _viewModel.completedEvaluations;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -70,12 +70,12 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+                          MaterialPageRoute(
+                              builder: (context) => const PantallaPrincipal()),
                         );
                       },
                     ),
                   ),
-                  
                   const Center(
                     child: Text(
                       'Historial de Evaluaciones',
@@ -86,7 +86,6 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
                       ),
                     ),
                   ),
-                  
                   const Align(
                     alignment: Alignment.centerRight,
                     child: SizedBox(
@@ -97,7 +96,6 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
                 ],
               ),
             ),
-
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
               child: Align(
@@ -112,7 +110,6 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
                 ),
               ),
             ),
-
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -157,7 +154,6 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
                 ),
               ),
             ),
-
             Container(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
               decoration: const BoxDecoration(
@@ -222,14 +218,14 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
               ],
             ),
           ),
-
           SizedBox(
             height: 32,
             child: ElevatedButton(
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const PantallaResultados()),
+                  MaterialPageRoute(
+                      builder: (context) => const PantallaResultados()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -255,7 +251,7 @@ class _PantallaHistorialEvaluacionesState extends State<PantallaHistorialEvaluac
   }
 
   Widget _buildNavButton(int index, IconData icon, String label) {
-    bool isSelected = _selectedIndex == index;
+    bool isSelected = _viewModel.selectedIndex == index;
 
     return GestureDetector(
       onTap: () => _navigateToTab(index),

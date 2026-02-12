@@ -1,1 +1,8 @@
 export 'result_viewmodel.dart';
+export 'login_viewmodel.dart';
+export 'test_viewmodel.dart';
+export 'profile_viewmodel.dart';
+export 'historial_viewmodel.dart';
+export 'oferta_educativa_viewmodel.dart';
+export 'recomendaciones_viewmodel.dart';
+export 'resultados_viewmodel.dart';

@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
+import '../viewmodels/viewmodels.dart';
 import 'views.dart';
 
 class PantallaOfertaEducativa extends StatefulWidget {
   final String carrera;
-   
+
   const PantallaOfertaEducativa({
     super.key,
     required this.carrera,
   });
 
   @override
-  State<PantallaOfertaEducativa> createState() => _PantallaOfertaEducativaState();
+  State<PantallaOfertaEducativa> createState() =>
+      _PantallaOfertaEducativaState();
 }
 
-class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
-  int _selectedIndex = 3;
+class _PantallaOfertaEducativaState
+    extends State<PantallaOfertaEducativa> {
+  final OfertaEducativaViewModel _viewModel = OfertaEducativaViewModel();
 
   void _navigateToTab(int index) {
-    if (index == _selectedIndex) return;
-    
-    setState(() {
-      _selectedIndex = index;
-    });
-    
+    if (index == _viewModel.selectedIndex) return;
+
     if (index == 0) {
       Navigator.pushReplacement(
         context,
@@ -36,12 +35,14 @@ class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+        MaterialPageRoute(
+            builder: (context) => const PantallaHistorialEvaluaciones()),
       );
     } else if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+        MaterialPageRoute(
+            builder: (context) => const PantallaRecomendacionesCarreras()),
       );
     } else if (index == 4) {
       Navigator.pushReplacement(
@@ -85,7 +86,6 @@ class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
                 ],
               ),
             ),
-
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -102,45 +102,32 @@ class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
                         ),
                       ),
                     ),
-
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Container(
                         height: 200,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          image: const DecorationImage(
-                            image: NetworkImage(
-                              'https://lh3.googleusercontent.com/aida-public/AB6AXuAGNk36T7u7lENmD4aoqAFegEamUZZ2-T6r-cjv8PArqrmI3jHz7Mk3rvHFZZVzyrG5knn2A-F-Q0TWYqEfHR9PB6fd68Xg-7EpmmeVaMJxc3KI6-iMri7RSRNg9gEWJ8ZbjpQQiATozleAALpByuNVRhGzrvHpXvivZgWJb9per37GnMsf7JUOKDJ6P6A23PY0K0j6XNQ8KsGgcUuAmRYg59p2x092FXGxOOOEnSBeb7NtJMvuItlUfMC59n93PQgwRUX5r3vU85y8',
-                            ),
+                          image: DecorationImage(
+                            image: NetworkImage(_viewModel.portadaUrl),
                             fit: BoxFit.cover,
                           ),
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    _construirItemInstitucion(
-                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAs6-W-VOGvkJSh-bxQCesM0fzBS9TPDhVRQObV-7hnUi-zmphJY-HuXyKS55kPKhcMF_NWdWAKFzMfZUIbUQEmOwxoRrErcv-h1atrC_zMiyteLbkQPfqRxfxhYegSS0PZTO76kk5VRqFA_IHl7QVrMGaSXdnfH5vU0qh6RsvVKZ-B2IGcc6FgncOhIGy4piX_DxEmKAeV4CIhCqbj_EULRAzZsI6Hz8611BJJOcTgw4EY_kRERpzf7ubluMngqaqK5HpCiy6uXgIX',
-                      nombre: 'Universidad Nacional del Centro del Perú',
-                      direccion: 'Av. Los Incas 123, Huancayo',
-                    ),
-                    _construirItemInstitucion(
-                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6egp3LaQ28dvND0lhsEB5D3GQS1v9TWk3U_6HF4D3WUUUcMoKCVpfWYTxOCcevRaz7bB68j70xGp5fvianqFJjrIbUro2VnD6N901az1PanxughZl7Pet8BrR0jDtx3rzWyJiSdJtodCxL1r8oBESBD886c0ZJQQjkk7-3IVEpDuxD-W-H1p45UsJjcrPuQfIuSMq8XEt5GlEH9pD3H7BrCsgWiDKGi1kdcWRebbxYZc2eEiZ7eyWowxr7f6aF78aocVpQqnxMGI1',
-                      nombre: 'Instituto Tecnológico Superior de Tarma',
-                      direccion: 'Jr. Libertad 456, Tarma',
-                    ),
-                    _construirItemInstitucion(
-                      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4j-dII-gv7elTzFwt9R7rcz_Ga_AR3X56w3eGs-Fwi5SbfCz4bvZJ2ELfSCt827MTnIGJ_xfsqW7F30kw0JJmciQeoKcmOvDKhzukO-cDWR_ZLR0T7lo8AbqcGy2taYMxAVWrMytq-u8x-1jbhUaYNI5TzWMsVT4awalZU4cYnfnsh_reJsJzlwIdSehn6cpLeNytQDZw920bw5Mssr1aNkURc-zYd4dFUi-fbOItPHa_TheKT5hhL8LOvIYg2jOT-PyGrJpH4owU',
-                      nombre: 'Instituto Pedagógico de Jauja',
-                      direccion: 'Calle Real 789, Jauja',
-                    ),
+                    ..._viewModel.instituciones.map((institucion) {
+                      return _construirItemInstitucion(
+                        imagenUrl: institucion.imagenUrl,
+                        nombre: institucion.nombre,
+                        direccion: institucion.direccion,
+                      );
+                    }),
                   ],
                 ),
               ),
             ),
-
             Container(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
               decoration: const BoxDecoration(
@@ -188,7 +175,6 @@ class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
             ),
           ),
           const SizedBox(width: 16),
-          
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -223,7 +209,7 @@ class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
   }
 
   Widget _buildNavButton(int index, IconData icon, String label) {
-    bool isSelected = _selectedIndex == index;
+    bool isSelected = _viewModel.selectedIndex == index;
 
     return GestureDetector(
       onTap: () => _navigateToTab(index),
@@ -248,7 +234,8 @@ class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
             label,
             style: TextStyle(
               fontSize: 11,
-              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              color:
+                  isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
           ),

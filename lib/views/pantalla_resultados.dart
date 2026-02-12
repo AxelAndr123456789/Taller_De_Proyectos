@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../viewmodels/viewmodels.dart';
 import 'views.dart';
 
 class PantallaResultados extends StatefulWidget {
@@ -9,6 +10,8 @@ class PantallaResultados extends StatefulWidget {
 }
 
 class _PantallaResultadosState extends State<PantallaResultados> {
+  final ResultadosViewModel _viewModel = ResultadosViewModel();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +36,9 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                         onPressed: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const PantallaHistorialEvaluaciones()),
                           );
                         },
                       ),
@@ -54,7 +59,6 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ],
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
@@ -69,13 +73,14 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(12)),
                           color: Colors.white,
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            '¡Tu Perfil Vocacional está Listo!',
-                            style: TextStyle(
+                            _viewModel.tituloMensaje,
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
@@ -86,12 +91,11 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                       Expanded(
                         child: Container(
                           width: double.infinity,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(12)),
                             image: DecorationImage(
-                              image: NetworkImage(
-                                'https://lh3.googleusercontent.com/aida-public/AB6AXuBi3by901MHaPUhDeQe8c2l33TPaA4BVQIDtTwrutvdkLzEi3ggkLOdSTpP9UXuluWpF0RassK3F9aJSrNTxiQ5v-wYKy3cNamdUwYU5lKB2mPXnDyadHJUEUTDQFyxkOdqexO5GKq9wXoeP39KTCGRrMa8J_x_8er5sFc2FpdJxMlMomwbax6bXhvsOwrrwbNtxehNC3alPmrlT_ErohxhQb80G99BfVcrrJXL_y0Hh5rZm7kp1iUX8_7eWOBisyeTRZKyiI2Ff7KX',
-                              ),
+                              image: NetworkImage(_viewModel.portadaUrl),
                               fit: BoxFit.contain,
                               alignment: Alignment.bottomCenter,
                             ),
@@ -102,26 +106,24 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'El Creador Analítico',
-                      style: TextStyle(
+                    Text(
+                      _viewModel.getTituloPerfil(),
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Te destacas en roles que requieren una combinación de pensamiento lógico y resolución creativa de problemas...',
-                      style: TextStyle(
+                    Text(
+                      _viewModel.getDescripcionPerfil(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
@@ -132,7 +134,6 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ],
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
@@ -140,17 +141,13 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     image: DecorationImage(
-                      image: NetworkImage(
-                        'https://lh3.googleusercontent.com/aida-public/AB6AXuC4Sc1bc4CvdU7mMDBpMbvqpFrv4wHT-mhJWweIiQYS9u99ymMp0phZ1rx_TcDcFPV2GXu3_YiPdYmS1tnPM2AEtX91vO3N25CCnd6SdMWt1VYEDIG7rNVJiAWKOLX2RSvGR_BdumPH9PpmPmN73EgstpnmpqCGUOnDnFLQJcwTiMpYAEVdSYZecqwgbTlGzqwG1ZEg9zecnrYohX94yonOfsTQS0qCwH-Z_lPWVf6Uok75GUIajJYOd57VpzJM_9rsg10dKZrVZGJO',
-                      ),
+                      image: NetworkImage(_viewModel.imagenPersonaje),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
@@ -165,9 +162,7 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 12),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -270,9 +265,7 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 24),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
@@ -287,9 +280,7 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 12),
-
               Column(
                 children: [
                   _construirItemCarrera(
@@ -309,9 +300,7 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 24),
-
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: SizedBox(
@@ -321,7 +310,9 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const PantallaRecomendacionesCarreras()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -341,7 +332,6 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ),
                 ),
               ),
-
               Container(
                 padding: const EdgeInsets.only(top: 8, bottom: 20),
                 decoration: const BoxDecoration(
@@ -353,11 +343,17 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _construirBotonNavegacion(context, Icons.home_outlined, 'Inicio', estaSeleccionado: false),
-                    _construirBotonNavegacion(context, Icons.checklist, 'Tests', estaSeleccionado: true),
-                    _construirBotonNavegacion(context, Icons.bar_chart_outlined, 'Resultados', estaSeleccionado: false),
-                    _construirBotonNavegacion(context, Icons.work_outline, 'Carreras', estaSeleccionado: false),
-                    _construirBotonNavegacion(context, Icons.person_outline, 'Perfil', estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.home_outlined, 'Inicio',
+                        estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.checklist, 'Tests',
+                        estaSeleccionado: true),
+                    _construirBotonNavegacion(
+                        context, Icons.bar_chart_outlined, 'Resultados',
+                        estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.work_outline, 'Carreras',
+                        estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.person_outline, 'Perfil',
+                        estaSeleccionado: false),
                   ],
                 ),
               ),
@@ -423,13 +419,15 @@ class _PantallaResultadosState extends State<PantallaResultados> {
     );
   }
 
-  Widget _construirBotonNavegacion(BuildContext context, IconData icono, String etiqueta, {bool estaSeleccionado = false}) {
+  Widget _construirBotonNavegacion(BuildContext context, IconData icono,
+      String etiqueta, {required bool estaSeleccionado}) {
     return GestureDetector(
       onTap: () {
         if (etiqueta == 'Inicio') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+            MaterialPageRoute(
+                builder: (context) => const PantallaPrincipal()),
           );
         } else if (etiqueta == 'Tests') {
           Navigator.pushReplacement(
@@ -439,12 +437,14 @@ class _PantallaResultadosState extends State<PantallaResultados> {
         } else if (etiqueta == 'Resultados') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+            MaterialPageRoute(
+                builder: (context) => const PantallaHistorialEvaluaciones()),
           );
         } else if (etiqueta == 'Carreras') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+            MaterialPageRoute(
+                builder: (context) => const PantallaRecomendacionesCarreras()),
           );
         } else if (etiqueta == 'Perfil') {
           Navigator.pushReplacement(
@@ -460,12 +460,15 @@ class _PantallaResultadosState extends State<PantallaResultados> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: estaSeleccionado ? const Color(0xFF121716).withValues(alpha: 0.1) : Colors.transparent,
+              color: estaSeleccionado
+                  ? const Color(0xFF121716).withValues(alpha: 0.1)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
               icono,
-              color: estaSeleccionado ? const Color(0xFF121716) : const Color(0xFF658680),
+              color:
+                  estaSeleccionado ? const Color(0xFF121716) : const Color(0xFF658680),
               size: 24,
             ),
           ),
@@ -475,7 +478,9 @@ class _PantallaResultadosState extends State<PantallaResultados> {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: estaSeleccionado ? const Color(0xFF121716) : const Color(0xFF658680),
+              color: estaSeleccionado
+                  ? const Color(0xFF121716)
+                  : const Color(0xFF658680),
             ),
           ),
         ],

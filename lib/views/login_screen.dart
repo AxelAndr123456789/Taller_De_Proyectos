@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import '../viewmodels/viewmodels.dart';
 import 'views.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,37 +11,32 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _showPassword = false;
+  final LoginViewModel _viewModel = LoginViewModel();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final List<String> _validEmails = [
-    'usuario@gmail.com',
-    'correo@hotmail.com',
-    'email@outlook.com',
-    'test@yahoo.com',
-    'admin@example.com'
-  ];
-  final String _validPassword = 'password123';
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text;
+      _viewModel.setEmail(_emailController.text.trim());
+      _viewModel.setPassword(_passwordController.text);
 
-      bool isValidEmail = _validEmails.contains(email);
-      bool isValidPassword = password == _validPassword;
-
-      if (isValidEmail && isValidPassword) {
+      if (_viewModel.login()) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Credenciales incorrectas. Intenta con: usuario@gmail.com y password123'),
+          SnackBar(
+            content: Text(_viewModel.errorMessage),
             backgroundColor: Colors.red,
           ),
         );
@@ -48,39 +44,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu correo electrónico';
-    }
-    
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Por favor ingresa un correo electrónico válido';
-    }
-    
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu contraseña';
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = kIsWeb && screenWidth > 800;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height - 
-                         MediaQuery.of(context).padding.top,
+              minHeight: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top,
             ),
             child: Center(
               child: Container(
@@ -111,18 +87,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.grey,
                         ),
                       ),
-
                       SizedBox(height: isDesktop ? 60 : 40),
                       _buildTextField(
                         label: 'Correo electrónico',
                         hint: 'usuario@gmail.com',
                         controller: _emailController,
                         isPassword: false,
-                        validator: _validateEmail,
+                        validator: _viewModel.validateEmail,
                       ),
                       const SizedBox(height: 20),
                       _buildPasswordField(),
-
                       SizedBox(height: isDesktop ? 60 : 40),
                       SizedBox(
                         width: double.infinity,
@@ -144,7 +118,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-
                       SizedBox(height: isDesktop ? 60 : 40),
                       Center(
                         child: Row(
@@ -157,8 +130,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextButton(
                               onPressed: () {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Funcionalidad de crear cuenta en desarrollo'),
+                                  SnackBar(
+                                    content: const Text(
+                                        'Funcionalidad de crear cuenta en desarrollo'),
                                     backgroundColor: Colors.blue,
                                   ),
                                 );
@@ -211,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           child: TextFormField(
             controller: controller,
-            obscureText: isPassword && !_showPassword,
+            obscureText: isPassword && !_viewModel.showPassword,
             validator: validator,
             decoration: InputDecoration(
               hintText: hint,
@@ -241,8 +215,8 @@ class _LoginScreenState extends State<LoginScreen> {
             TextButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Contraseña de ejemplo: password123'),
+                  SnackBar(
+                    content: Text(_viewModel.getDemoCredentialsMessage()),
                     backgroundColor: Colors.blue,
                   ),
                 );
@@ -269,8 +243,8 @@ class _LoginScreenState extends State<LoginScreen> {
               Expanded(
                 child: TextFormField(
                   controller: _passwordController,
-                  obscureText: !_showPassword,
-                  validator: _validatePassword,
+                  obscureText: !_viewModel.showPassword,
+                  validator: _viewModel.validatePassword,
                   decoration: const InputDecoration(
                     hintText: 'password123',
                     border: InputBorder.none,
@@ -280,12 +254,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               IconButton(
                 onPressed: () {
-                  setState(() {
-                    _showPassword = !_showPassword;
-                  });
+                  _viewModel.toggleShowPassword();
                 },
                 icon: Icon(
-                  _showPassword ? Icons.visibility : Icons.visibility_off,
+                  _viewModel.showPassword
+                      ? Icons.visibility
+                      : Icons.visibility_off,
                   color: Colors.grey,
                 ),
               ),
