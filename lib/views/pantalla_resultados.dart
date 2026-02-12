@@ -1,29 +1,14 @@
 import 'package:flutter/material.dart';
+import 'views.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Stitch Career',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Epilogue',
-        useMaterial3: true,
-      ),
-      home: const PantallaResultados(),
-    );
-  }
-}
-
-class PantallaResultados extends StatelessWidget {
+class PantallaResultados extends StatefulWidget {
   const PantallaResultados({super.key});
 
+  @override
+  State<PantallaResultados> createState() => _PantallaResultadosState();
+}
+
+class _PantallaResultadosState extends State<PantallaResultados> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +17,6 @@ class PantallaResultados extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Encabezado con botón de regresar
               Container(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -47,7 +31,10 @@ class PantallaResultados extends StatelessWidget {
                         icon: const Icon(Icons.arrow_back),
                         color: const Color(0xFF121716),
                         onPressed: () {
-                          // Sin funcionalidad por ahora
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+                          );
                         },
                       ),
                     ),
@@ -63,102 +50,100 @@ class PantallaResultados extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 48), // Espacio para centrar
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
 
-              // Banner principal con imagen
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
-                  height: 200,
+                  height: 260,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                        'https://lh3.googleusercontent.com/aida-public/AB6AXuBi3by901MHaPUhDeQe8c2l33TPaA4BVQIDtTwrutvdkLzEi3ggkLOdSTpP9UXuluWpF0RassK3F9aJSrNTxiQ5v-wYKy3cNamdUwYU5lKB2mPXnDyadHJUEUTDQFyxkOdqexO5GKq9wXoeP39KTCGRrMa8J_x_8er5sFc2FpdJxMlMomwbax6bXhvsOwrrwbNtxehNC3alPmrlT_ErohxhQb80G99BfVcrrJXL_y0Hh5rZm7kp1iUX8_7eWOBisyeTRZKyiI2Ff7KX',
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.center,
-                      colors: [
-                        Colors.black.withOpacity(0.4),
-                        Colors.transparent,
-                      ],
-                      stops: const [0, 0.25],
-                    ),
+                    color: const Color(0xFFF5F5F5),
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Text(
-                        '¡Tu Perfil Vocacional está Listo!',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                           color: Colors.white,
                         ),
+                        child: const Center(
+                          child: Text(
+                            '¡Tu Perfil Vocacional está Listo!',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                'https://lh3.googleusercontent.com/aida-public/AB6AXuBi3by901MHaPUhDeQe8c2l33TPaA4BVQIDtTwrutvdkLzEi3ggkLOdSTpP9UXuluWpF0RassK3F9aJSrNTxiQ5v-wYKy3cNamdUwYU5lKB2mPXnDyadHJUEUTDQFyxkOdqexO5GKq9wXoeP39KTCGRrMa8J_x_8er5sFc2FpdJxMlMomwbax6bXhvsOwrrwbNtxehNC3alPmrlT_ErohxhQb80G99BfVcrrJXL_y0Hh5rZm7kp1iUX8_7eWOBisyeTRZKyiI2Ff7KX',
+                              ),
+                              fit: BoxFit.contain,
+                              alignment: Alignment.bottomCenter,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // Tarjeta de perfil
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'El Creador Analítico',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Te destacas en roles que requieren una combinación de pensamiento lógico y resolución creativa de problemas...',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
-                  height: 200,
+                  height: 180,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    image: const DecorationImage(
+                    image: DecorationImage(
                       image: NetworkImage(
                         'https://lh3.googleusercontent.com/aida-public/AB6AXuC4Sc1bc4CvdU7mMDBpMbvqpFrv4wHT-mhJWweIiQYS9u99ymMp0phZ1rx_TcDcFPV2GXu3_YiPdYmS1tnPM2AEtX91vO3N25CCnd6SdMWt1VYEDIG7rNVJiAWKOLX2RSvGR_BdumPH9PpmPmN73EgstpnmpqCGUOnDnFLQJcwTiMpYAEVdSYZecqwgbTlGzqwG1ZEg9zecnrYohX94yonOfsTQS0qCwH-Z_lPWVf6Uok75GUIajJYOd57VpzJM_9rsg10dKZrVZGJO',
                       ),
                       fit: BoxFit.cover,
-                    ),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.center,
-                      colors: [
-                        Colors.black.withOpacity(0.4),
-                        Colors.transparent,
-                      ],
-                      stops: const [0, 1],
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'El Creador Analítico',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Te destacas en roles que requieren una combinación de pensamiento lógico y resolución creativa de problemas...',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
                     ),
                   ),
                 ),
@@ -166,7 +151,6 @@ class PantallaResultados extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Título: Desglose del Perfil
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
@@ -184,12 +168,10 @@ class PantallaResultados extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // Tarjetas de porcentajes
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    // Intereses
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(16),
@@ -221,10 +203,7 @@ class PantallaResultados extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 8),
-
-                    // Aptitudes
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(16),
@@ -256,10 +235,7 @@ class PantallaResultados extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 8),
-
-                    // Personalidad
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(16),
@@ -297,7 +273,6 @@ class PantallaResultados extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Título: Top Recomendaciones de Carreras
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
@@ -315,7 +290,6 @@ class PantallaResultados extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // Lista de carreras recomendadas
               Column(
                 children: [
                   _construirItemCarrera(
@@ -338,7 +312,6 @@ class PantallaResultados extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Botón Explorar Carreras
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: SizedBox(
@@ -346,7 +319,10 @@ class PantallaResultados extends StatelessWidget {
                   height: 48,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Sin funcionalidad por ahora
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF22C3A8),
@@ -366,7 +342,6 @@ class PantallaResultados extends StatelessWidget {
                 ),
               ),
 
-              // Barra de navegación inferior
               Container(
                 padding: const EdgeInsets.only(top: 8, bottom: 20),
                 decoration: const BoxDecoration(
@@ -378,11 +353,11 @@ class PantallaResultados extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _construirBotonNavegacion(Icons.home_outlined, 'Inicio', estaSeleccionado: false),
-                    _construirBotonNavegacion(Icons.checklist, 'Tests', estaSeleccionado: true),
-                    _construirBotonNavegacion(Icons.bar_chart_outlined, 'Resultados', estaSeleccionado: false),
-                    _construirBotonNavegacion(Icons.work_outline, 'Carreras', estaSeleccionado: false),
-                    _construirBotonNavegacion(Icons.person_outline, 'Perfil', estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.home_outlined, 'Inicio', estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.checklist, 'Tests', estaSeleccionado: true),
+                    _construirBotonNavegacion(context, Icons.bar_chart_outlined, 'Resultados', estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.work_outline, 'Carreras', estaSeleccionado: false),
+                    _construirBotonNavegacion(context, Icons.person_outline, 'Perfil', estaSeleccionado: false),
                   ],
                 ),
               ),
@@ -448,10 +423,35 @@ class PantallaResultados extends StatelessWidget {
     );
   }
 
-  Widget _construirBotonNavegacion(IconData icono, String etiqueta, {bool estaSeleccionado = false}) {
+  Widget _construirBotonNavegacion(BuildContext context, IconData icono, String etiqueta, {bool estaSeleccionado = false}) {
     return GestureDetector(
       onTap: () {
-        // Sin funcionalidad por ahora
+        if (etiqueta == 'Inicio') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+          );
+        } else if (etiqueta == 'Tests') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const TestsScreen()),
+          );
+        } else if (etiqueta == 'Resultados') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+          );
+        } else if (etiqueta == 'Carreras') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+          );
+        } else if (etiqueta == 'Perfil') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => PantallaPerfil()),
+          );
+        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -460,7 +460,7 @@ class PantallaResultados extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: estaSeleccionado ? const Color(0xFF121716).withOpacity(0.1) : Colors.transparent,
+              color: estaSeleccionado ? const Color(0xFF121716).withValues(alpha: 0.1) : Colors.transparent,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(

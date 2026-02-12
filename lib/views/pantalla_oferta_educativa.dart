@@ -1,28 +1,55 @@
 import 'package:flutter/material.dart';
+import 'views.dart';
 
-void main() {
-  runApp(const MiApp());
-}
-
-class MiApp extends StatelessWidget {
-  const MiApp({super.key});
+class PantallaOfertaEducativa extends StatefulWidget {
+  final String carrera;
+   
+  const PantallaOfertaEducativa({
+    super.key,
+    required this.carrera,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Stitch Career',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Epilogue',
-        useMaterial3: true,
-      ),
-      home: const PantallaOfertaEducativa(),
-    );
-  }
+  State<PantallaOfertaEducativa> createState() => _PantallaOfertaEducativaState();
 }
 
-class PantallaOfertaEducativa extends StatelessWidget {
-  const PantallaOfertaEducativa({super.key});
+class _PantallaOfertaEducativaState extends State<PantallaOfertaEducativa> {
+  int _selectedIndex = 3;
+
+  void _navigateToTab(int index) {
+    if (index == _selectedIndex) return;
+    
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
+      );
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TestsScreen()),
+      );
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaHistorialEvaluaciones()),
+      );
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PantallaRecomendacionesCarreras()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PantallaPerfil()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +58,6 @@ class PantallaOfertaEducativa extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Encabezado con botón de retroceso
             Container(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -40,13 +66,13 @@ class PantallaOfertaEducativa extends StatelessWidget {
                     icon: const Icon(Icons.arrow_back),
                     color: const Color(0xFF121617),
                     onPressed: () {
-                      // Sin funcionalidad por ahora
+                      Navigator.pop(context);
                     },
                   ),
                   const Expanded(
                     child: Center(
                       child: Text(
-                        'Oferta Educativa Regional',
+                        'Oferta Educativa',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -60,44 +86,41 @@ class PantallaOfertaEducativa extends StatelessWidget {
               ),
             ),
 
-            // Título: Universidades e Institutos
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Universidades e Institutos',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF121617),
-                  ),
-                ),
-              ),
-            ),
-
-            // Imagen principal
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  image: const DecorationImage(
-                    image: NetworkImage(
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAGNk36T7u7lENmD4aoqAFegEamUZZ2-T6r-cjv8PArqrmI3jHz7Mk3rvHFZZVzyrG5knn2A-F-Q0TWYqEfHR9PB6fd68Xg-7EpmmeVaMJxc3KI6-iMri7RSRNg9gEWJ8ZbjpQQiATozleAALpByuNVRhGzrvHpXvivZgWJb9per37GnMsf7JUOKDJ6P6A23PY0K0j6XNQ8KsGgcUuAmRYg59p2x092FXGxOOOEnSBeb7NtJMvuItlUfMC59n93PQgwRUX5r3vU85y8',
-                    ),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-
-            // Lista de instituciones
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+                      child: Text(
+                        'Universidades e Institutos',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF121617),
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: const DecorationImage(
+                            image: NetworkImage(
+                              'https://lh3.googleusercontent.com/aida-public/AB6AXuAGNk36T7u7lENmD4aoqAFegEamUZZ2-T6r-cjv8PArqrmI3jHz7Mk3rvHFZZVzyrG5knn2A-F-Q0TWYqEfHR9PB6fd68Xg-7EpmmeVaMJxc3KI6-iMri7RSRNg9gEWJ8ZbjpQQiATozleAALpByuNVRhGzrvHpXvivZgWJb9per37GnMsf7JUOKDJ6P6A23PY0K0j6XNQ8KsGgcUuAmRYg59p2x092FXGxOOOEnSBeb7NtJMvuItlUfMC59n93PQgwRUX5r3vU85y8',
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
                     _construirItemInstitucion(
                       imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAs6-W-VOGvkJSh-bxQCesM0fzBS9TPDhVRQObV-7hnUi-zmphJY-HuXyKS55kPKhcMF_NWdWAKFzMfZUIbUQEmOwxoRrErcv-h1atrC_zMiyteLbkQPfqRxfxhYegSS0PZTO76kk5VRqFA_IHl7QVrMGaSXdnfH5vU0qh6RsvVKZ-B2IGcc6FgncOhIGy4piX_DxEmKAeV4CIhCqbj_EULRAzZsI6Hz8611BJJOcTgw4EY_kRERpzf7ubluMngqaqK5HpCiy6uXgIX',
                       nombre: 'Universidad Nacional del Centro del Perú',
@@ -118,7 +141,6 @@ class PantallaOfertaEducativa extends StatelessWidget {
               ),
             ),
 
-            // Barra de navegación inferior
             Container(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
               decoration: const BoxDecoration(
@@ -130,11 +152,11 @@ class PantallaOfertaEducativa extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _construirBotonNavegacion(Icons.home_outlined, 'Inicio', estaSeleccionado: false),
-                  _construirBotonNavegacion(Icons.checklist, 'Tests', estaSeleccionado: false),
-                  _construirBotonNavegacion(Icons.emoji_events_outlined, 'Resultados', estaSeleccionado: false),
-                  _construirBotonNavegacion(Icons.work_outline, 'Carreras', estaSeleccionado: true),
-                  _construirBotonNavegacion(Icons.person_outline, 'Perfil', estaSeleccionado: false),
+                  _buildNavButton(0, Icons.home, 'Inicio'),
+                  _buildNavButton(1, Icons.list, 'Tests'),
+                  _buildNavButton(2, Icons.bar_chart, 'Resultados'),
+                  _buildNavButton(3, Icons.work, 'Carreras'),
+                  _buildNavButton(4, Icons.person, 'Perfil'),
                 ],
               ),
             ),
@@ -154,7 +176,6 @@ class PantallaOfertaEducativa extends StatelessWidget {
       height: 72,
       child: Row(
         children: [
-          // Logo de la institución
           Container(
             width: 56,
             height: 56,
@@ -168,7 +189,6 @@ class PantallaOfertaEducativa extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           
-          // Información de la institución
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -202,11 +222,11 @@ class PantallaOfertaEducativa extends StatelessWidget {
     );
   }
 
-  Widget _construirBotonNavegacion(IconData icono, String etiqueta, {bool estaSeleccionado = false}) {
+  Widget _buildNavButton(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
     return GestureDetector(
-      onTap: () {
-        // Sin funcionalidad por ahora
-      },
+      onTap: () => _navigateToTab(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -214,22 +234,22 @@ class PantallaOfertaEducativa extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: estaSeleccionado ? const Color(0xFF121617).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
+              shape: BoxShape.circle,
+              color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
             ),
             child: Icon(
-              icono,
-              color: estaSeleccionado ? const Color(0xFF121617) : const Color(0xFF657C86),
+              icon,
+              color: isSelected ? Colors.white : const Color(0xFF637D88),
               size: 24,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            etiqueta,
+            label,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: estaSeleccionado ? const Color(0xFF121617) : const Color(0xFF657C86),
+              color: isSelected ? const Color(0xFF0052FF) : const Color(0xFF637D88),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
           ),
         ],

@@ -1,28 +1,14 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MiApp());
-}
-
-class MiApp extends StatelessWidget {
-  const MiApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Stitch Career',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Epilogue',
-        useMaterial3: true,
-      ),
-      home: const PantallaDetallesCarrera(),
-    );
-  }
-}
+import '../models/carrera.dart';
+import 'views.dart';
 
 class PantallaDetallesCarrera extends StatelessWidget {
-  const PantallaDetallesCarrera({super.key});
+  final Carrera carrera;
+   
+  const PantallaDetallesCarrera({
+    super.key,
+    required this.carrera,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +18,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Encabezado con botón de retroceso
               Container(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -41,7 +26,7 @@ class PantallaDetallesCarrera extends StatelessWidget {
                       icon: const Icon(Icons.arrow_back),
                       color: const Color(0xFF121617),
                       onPressed: () {
-                        // Sin funcionalidad por ahora
+                        Navigator.pop(context);
                       },
                     ),
                     const Expanded(
@@ -61,31 +46,27 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Imagen de portada
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   height: 218,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                        'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
-                      ),
+                    image: DecorationImage(
+                      image: NetworkImage(carrera.portadaUrl),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ),
 
-              // Título de la carrera
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Ingeniero de Software',
-                    style: TextStyle(
+                    carrera.nombre,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF121617),
@@ -94,12 +75,11 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Descripción
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
-                  'Los ingenieros de software diseñan, desarrollan, prueban y mantienen aplicaciones y sistemas de software. Aplican principios de ingeniería para crear soluciones de software eficientes y confiables.',
-                  style: TextStyle(
+                  carrera.descripcion,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
                     color: Color(0xFF121617),
@@ -108,7 +88,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Título: Habilidades Requeridas
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
                 child: Align(
@@ -124,7 +103,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Tarjetas de habilidades
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
@@ -147,7 +125,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Título: Duración
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
                 child: Align(
@@ -163,7 +140,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Descripción de duración
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
@@ -177,7 +153,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Título: Mercado Laboral
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
                 child: Align(
@@ -193,7 +168,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Descripción del mercado laboral
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
@@ -207,7 +181,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Botón "Dónde estudiar"
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: SizedBox(
@@ -215,7 +188,14 @@ class PantallaDetallesCarrera extends StatelessWidget {
                   height: 40,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Sin funcionalidad por ahora
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PantallaOfertaEducativa(
+                            carrera: carrera.nombre,
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1B7298),
@@ -235,29 +215,7 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              // Espacio para la barra de navegación
               const SizedBox(height: 20),
-
-              // Barra de navegación inferior
-              Container(
-                padding: const EdgeInsets.only(top: 8, bottom: 20),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Color(0xFFF0F3F4)),
-                  ),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _construirBotonNavegacion(Icons.home_outlined, 'Inicio', estaSeleccionado: false),
-                    _construirBotonNavegacion(Icons.checklist, 'Tests', estaSeleccionado: false),
-                    _construirBotonNavegacion(Icons.bar_chart_outlined, 'Resultados', estaSeleccionado: false),
-                    _construirBotonNavegacion(Icons.work_outline, 'Carreras', estaSeleccionado: true),
-                    _construirBotonNavegacion(Icons.person_outline, 'Perfil', estaSeleccionado: false),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -292,41 +250,6 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF121617),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _construirBotonNavegacion(IconData icono, String etiqueta, {bool estaSeleccionado = false}) {
-    return GestureDetector(
-      onTap: () {
-        // Sin funcionalidad por ahora
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: estaSeleccionado ? const Color(0xFF121617).withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Icon(
-              icono,
-              color: estaSeleccionado ? const Color(0xFF121617) : const Color(0xFF657C86),
-              size: 24,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            etiqueta,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: estaSeleccionado ? const Color(0xFF121617) : const Color(0xFF657C86),
             ),
           ),
         ],
