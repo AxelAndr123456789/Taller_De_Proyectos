@@ -85,6 +85,8 @@ class PantallaDetallesCarrera extends StatelessWidget {
                     color: Color(0xFF121617),
                     height: 1.5,
                   ),
+                  maxLines: 5,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
 
@@ -106,22 +108,15 @@ class PantallaDetallesCarrera extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
-                  children: [
-                    _construirTarjetaHabilidad(
-                      icono: Icons.code,
-                      titulo: 'Programación',
-                    ),
-                    const SizedBox(height: 12),
-                    _construirTarjetaHabilidad(
-                      icono: Icons.storage,
-                      titulo: 'Gestión de Bases de Datos',
-                    ),
-                    const SizedBox(height: 12),
-                    _construirTarjetaHabilidad(
-                      icono: Icons.gite,
-                      titulo: 'Control de Versiones',
-                    ),
-                  ],
+                  children: carrera.habilidades.map((habilidad) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _construirTarjetaHabilidad(
+                        icono: _getIconForSkill(habilidad),
+                        titulo: habilidad,
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
 
@@ -140,15 +135,32 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  'Generalmente requiere una Licenciatura en Ciencias de la Computación o un campo relacionado, que toma aproximadamente 4 años completar.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Color(0xFF121617),
-                    height: 1.5,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFDCE2E5)),
+                    color: const Color(0xFFF5F5F5),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        color: Color(0xFF1B7298),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        carrera.duracion,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF121617),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -168,11 +180,11 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 ),
               ),
 
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
-                  'El mercado laboral para ingenieros de software es robusto, con alta demanda en varias industrias. Las oportunidades van desde startups hasta grandes corporaciones, ofreciendo salarios competitivos y potencial de crecimiento.',
-                  style: TextStyle(
+                  carrera.mercadoLaboral,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
                     color: Color(0xFF121617),
@@ -185,7 +197,7 @@ class PantallaDetallesCarrera extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 40,
+                  height: 48,
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -206,7 +218,7 @@ class PantallaDetallesCarrera extends StatelessWidget {
                     child: const Text(
                       'Dónde estudiar',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -255,5 +267,31 @@ class PantallaDetallesCarrera extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  IconData _getIconForSkill(String skill) {
+    final skillLower = skill.toLowerCase();
+    if (skillLower.contains('program') || skillLower.contains('código')) {
+      return Icons.code;
+    } else if (skillLower.contains('comunica')) {
+      return Icons.chat;
+    } else if (skillLower.contains('análisis') || skillLower.contains('diagnóstico')) {
+      return Icons.analytics;
+    } else if (skillLower.contains('empatía') || skillLower.contains('humano')) {
+      return Icons.favorite;
+    } else if (skillLower.contains('gestión') || skillLower.contains('admin')) {
+      return Icons.business;
+    } else if (skillLower.contains('diseño') || skillLower.contains('creativ')) {
+      return Icons.palette;
+    } else if (skillLower.contains('trabajo') || skillLower.contains('equipo')) {
+      return Icons.groups;
+    } else if (skillLower.contains('liderazgo')) {
+      return Icons.leaderboard;
+    } else if (skillLower.contains('atención') || skillLower.contains('cuidado')) {
+      return Icons.healing;
+    } else if (skillLower.contains('precisión') || skillLower.contains('manual')) {
+      return Icons.precision_manufacturing;
+    }
+    return Icons.star;
   }
 }

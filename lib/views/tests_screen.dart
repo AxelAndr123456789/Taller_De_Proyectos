@@ -44,8 +44,9 @@ class _TestsScreenState extends State<TestsScreen> {
   }
 
   void _navigateToTest(String testType, String testTitle) {
+    // Si se completó un ciclo anterior, iniciar nuevo ciclo manteniendo el historial
     if (_resultManager.shouldResetForNewCycle()) {
-      _resultManager.resetAllTests();
+      _resultManager.startNewTestCycle();
     }
     
     Navigator.push(

@@ -18,17 +18,20 @@ class TestQuestionsScreen extends StatefulWidget {
 
 class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
   int _selectedIndex = 1;
-  int _selectedOption = 0;
+  int _selectedOption = -1;
   int _currentQuestion = 1;
   final int _totalQuestions = 10;
   bool _isSubmitting = false;
   final ResultManager _resultManager = ResultManager();
+  
+  // Almacenar respuestas de todas las preguntas
+  final List<int> _allResponses = [];
 
   final List<String> _options = [
-    'Totalmente en desacuerdo',
-    'En desacuerdo',
-    'De acuerdo',
     'Totalmente de acuerdo',
+    'De acuerdo',
+    'En desacuerdo',
+    'Totalmente en desacuerdo',
   ];
 
   void _navigateToTab(int index) {
@@ -77,16 +80,42 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
       return;
     }
     
+    // Validar que se haya seleccionado una opción
+    if (_selectedOption == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor selecciona una respuesta'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+    
+    // Guardar la respuesta actual
+    if (_allResponses.length >= _currentQuestion) {
+      _allResponses[_currentQuestion - 1] = _selectedOption;
+    } else {
+      _allResponses.add(_selectedOption);
+    }
+    
     if (_currentQuestion < _totalQuestions) {
       setState(() {
         _currentQuestion++;
-        _selectedOption = 0;
+        // Restaurar respuesta si ya existe
+        if (_allResponses.length >= _currentQuestion) {
+          _selectedOption = _allResponses[_currentQuestion - 1];
+        } else {
+          _selectedOption = -1;
+        }
       });
     } else {
       setState(() {
         _isSubmitting = true;
       });
       
+      // Guardar todas las respuestas del test
+      _resultManager.saveTestResponses(widget.testType, List.from(_allResponses));
       _resultManager.addResult(widget.testType, widget.testTitle);
       
       if (_resultManager.areAllTestsCompleted()) {
@@ -121,9 +150,23 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
 
   void _goToPreviousQuestion() {
     if (_currentQuestion > 1) {
+      // Guardar respuesta actual antes de retroceder
+      if (_selectedOption != -1) {
+        if (_allResponses.length >= _currentQuestion) {
+          _allResponses[_currentQuestion - 1] = _selectedOption;
+        } else {
+          _allResponses.add(_selectedOption);
+        }
+      }
+      
       setState(() {
         _currentQuestion--;
-        _selectedOption = 0;
+        // Restaurar respuesta anterior
+        if (_allResponses.length >= _currentQuestion) {
+          _selectedOption = _allResponses[_currentQuestion - 1];
+        } else {
+          _selectedOption = -1;
+        }
       });
     }
   }
@@ -338,50 +381,85 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
     }
   }
 
+  // Test de Intereses Vocacionales - 10 preguntas organizadas por áreas
+  // Cada área tiene 1-2 preguntas específicas
   String _getInteresVocacionalQuestion(int number) {
     final questions = [
-      '¿Disfrutas diseñando gráficos digitales?',
-      '¿Te gusta investigar temas científicos?',
-      '¿Te interesa ayudar a personas con problemas?',
-      '¿Disfrutas trabajando con números y datos?',
-      '¿Te gusta crear contenido artístico?',
-      '¿Te interesan las máquinas y la tecnología?',
-      '¿Disfrutas organizando eventos?',
-      '¿Te gusta enseñar a otras personas?',
-      '¿Te interesa el mundo de los negocios?',
-      '¿Disfrutas analizando problemas complejos?',
+      // Administración y Negocios (2 preguntas)
+      '¿Te interesa liderar equipos y tomar decisiones estratégicas en una empresa?',
+      '¿Te gustaría gestionar recursos financieros y administrativos?',
+      
+      // Salud (2 preguntas)
+      '¿Te apasiona ayudar a personas a mejorar su salud y bienestar?',
+      '¿Te interesa conocer cómo funciona el cuerpo humano y tratar enfermedades?',
+      
+      // Ingeniería y Tecnología (2 preguntas)
+      '¿Te fascina diseñar, construir o mejorar estructuras y máquinas?',
+      '¿Te gustaría desarrollar software o trabajar con tecnología de vanguardia?',
+      
+      // Ciencias (1 pregunta)
+      '¿Te interesa investigar fenómenos naturales y realizar experimentos científicos?',
+      
+      // Arte y Diseño (1 pregunta)
+      '¿Disfrutas creando diseños, ilustraciones o espacios estéticamente atractivos?',
+      
+      // Educación (1 pregunta)
+      '¿Te gustaría enseñar y formar a niños, jóvenes o adultos?',
+      
+      // Ciencias Sociales y Legal (1 pregunta)
+      '¿Te interesa comprender el comportamiento humano o defender derechos y justicia?',
     ];
     return questions[number - 1];
   }
 
+  // Test de Aptitudes - 10 preguntas organizadas por habilidades específicas de áreas
   String _getAptitudesQuestion(int number) {
     final questions = [
-      '¿Te resulta fácil resolver problemas matemáticos complejos?',
-      '¿Tienes buena memoria para recordar detalles?',
-      '¿Eres hábil con las herramientas manuales?',
-      '¿Tienes facilidad para aprender idiomas?',
-      '¿Eres bueno identificando patrones?',
-      '¿Tienes buena coordinación mano-ojo?',
-      '¿Eres bueno expresándote por escrito?',
-      '¿Tienes facilidad para entender mapas?',
-      '¿Eres bueno trabajando bajo presión?',
-      '¿Tienes habilidad para negociar?',
+      // Administración (2 preguntas)
+      '¿Eres bueno organizando información y gestionando múltiples tareas?',
+      '¿Tienes facilidad para analizar datos numéricos y financieros?',
+      
+      // Salud (2 preguntas)
+      '¿Tienes empatía y capacidad de escucha para atender a personas enfermas?',
+      '¿Puedes mantener la calma y tomar decisiones rápidas en situaciones de emergencia?',
+      
+      // Ingeniería (2 preguntas)
+      '¿Eres bueno resolviendo problemas matemáticos y lógicos?',
+      '¿Tienes habilidad para visualizar objetos en 3D y entender cómo funcionan las cosas?',
+      
+      // Tecnología (2 preguntas)
+      '¿Aprendes rápidamente a usar nuevos programas y aplicaciones?',
+      '¿Eres bueno detectando errores y mejorando procesos sistemáticos?',
+      
+      // Comunicación y Creatividad (2 preguntas)
+      '¿Eres bueno expresándote y comunicándote con diferentes tipos de personas?',
+      '¿Tienes creatividad para proponer soluciones innovadoras?',
     ];
     return questions[number - 1];
   }
 
+  // Test de Personalidad - 10 preguntas sobre rasgos de personalidad por área
   String _getPersonalidadQuestion(int number) {
     final questions = [
-      '¿Prefieres trabajar en equipo que individualmente?',
-      '¿Te consideras una persona extrovertida?',
-      '¿Eres meticuloso con los detalles?',
-      '¿Te gusta tomar riesgos?',
-      '¿Eres paciente con los demás?',
-      '¿Prefieres seguir instrucciones que dar órdenes?',
-      '¿Te adaptas fácilmente a cambios?',
-      '¿Eres bueno manejando el estrés?',
-      '¿Prefieres rutinas establecidas?',
-      '¿Te gusta tomar decisiones rápidas?',
+      // Administración y Liderazgo (2 preguntas)
+      '¿Te consideras una persona organizada y responsable con los detalles?',
+      '¿Disfrutas liderando equipos y coordinando actividades grupales?',
+      
+      // Salud (2 preguntas)
+      '¿Eres paciente y comprensivo con las necesidades de otras personas?',
+      '¿Puedes trabajar bajo presión sin perder la calma?',
+      
+      // Ingeniería y Tecnología (2 preguntas)
+      '¿Prefieres trabajar con precisión y exactitud en tus tareas?',
+      '¿Eres curioso y te gusta investigar cómo funcionan las cosas?',
+      
+      // Creatividad y Comunicación (2 preguntas)
+      '¿Te adaptas fácilmente a nuevos ambientes y situaciones?',
+      '¿Te consideras extrovertido y te gusta interactuar socialmente?',
+      
+      // Trabajo y Ética (2 preguntas)
+      '¿Eres perseverante y no te rindes fácilmente ante los desafíos?',
+      '¿Valoras el trabajo bien hecho y cumples con tus compromisos?',
     ];
     return questions[number - 1];
   }
@@ -397,9 +475,12 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
+            color: Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isSelected ? const Color(0xFF111618) : const Color(0xFFDCE2E5),

@@ -39,4 +39,10 @@ class HistorialEvaluacionesViewModel with ChangeNotifier {
   int getTotalTestsCount() {
     return 3; // Intereses, Aptitudes, Personalidad
   }
+
+  /// Inicia un nuevo ciclo de evaluación manteniendo el historial
+  void startNewEvaluationCycle() {
+    _resultManager.startNewTestCycle();
+    notifyListeners();
+  }
 }

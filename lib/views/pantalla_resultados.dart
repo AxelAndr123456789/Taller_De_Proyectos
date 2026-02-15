@@ -106,42 +106,48 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+              // Carrera Recomendada Centrada
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      _viewModel.getTituloPerfil(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                    Center(
+                      child: Text(
+                        _viewModel.carreraRecomendada,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Text(
-                      _viewModel.getDescripcionPerfil(),
+                      _viewModel.descripcionCarrera,
                       style: const TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black87,
+                        height: 1.5,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.justify,
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
+              // Imagen de la Carrera
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
-                  height: 180,
+                  height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     image: DecorationImage(
-                      image: NetworkImage(_viewModel.imagenPersonaje),
+                      image: NetworkImage(_viewModel.imagenCarrera),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -174,10 +180,10 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: const Color(0xFFDCE5E3)),
                         ),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Intereses',
                               style: TextStyle(
                                 fontSize: 14,
@@ -185,10 +191,10 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                                 color: Color(0xFF121716),
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              '85%',
-                              style: TextStyle(
+                              '${_viewModel.getPorcentajeIntereses()}%',
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF121716),
@@ -206,10 +212,10 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: const Color(0xFFDCE5E3)),
                         ),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Aptitudes',
                               style: TextStyle(
                                 fontSize: 14,
@@ -217,10 +223,10 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                                 color: Color(0xFF121716),
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              '92%',
-                              style: TextStyle(
+                              '${_viewModel.getPorcentajeAptitudes()}%',
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF121716),
@@ -238,10 +244,10 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: const Color(0xFFDCE5E3)),
                         ),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Personalidad',
                               style: TextStyle(
                                 fontSize: 14,
@@ -249,10 +255,10 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                                 color: Color(0xFF121716),
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              '78%',
-                              style: TextStyle(
+                              '${_viewModel.getPorcentajePersonalidad()}%',
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF121716),
@@ -281,25 +287,7 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                 ),
               ),
               const SizedBox(height: 12),
-              Column(
-                children: [
-                  _construirItemCarrera(
-                    icono: Icons.code,
-                    titulo: 'Ingeniería de Software',
-                    coincidencia: '95% Coincidencia',
-                  ),
-                  _construirItemCarrera(
-                    icono: Icons.edit,
-                    titulo: 'Diseño Digital',
-                    coincidencia: '92% Coincidencia',
-                  ),
-                  _construirItemCarrera(
-                    icono: Icons.timeline,
-                    titulo: 'Ciencia de Datos',
-                    coincidencia: '88% Coincidencia',
-                  ),
-                ],
-              ),
+              _buildCareerRecommendations(),
               const SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -364,10 +352,50 @@ class _PantallaResultadosState extends State<PantallaResultados> {
     );
   }
 
+  Widget _buildCareerRecommendations() {
+    final carreras = _viewModel.getCarrerasAfines();
+    
+    if (carreras.isEmpty) {
+      // Mostrar carreras por defecto si no hay datos
+      return Column(
+        children: [
+          _construirItemCarrera(
+            icono: Icons.code,
+            titulo: 'Ingeniería de Software',
+          ),
+          _construirItemCarrera(
+            icono: Icons.edit,
+            titulo: 'Diseño Digital',
+          ),
+          _construirItemCarrera(
+            icono: Icons.timeline,
+            titulo: 'Ciencia de Datos',
+          ),
+        ],
+      );
+    }
+    
+    // Tomar las primeras 3 carreras afines
+    final topCarreras = carreras.take(3).toList();
+    final iconos = [Icons.code, Icons.edit, Icons.timeline, 
+                    Icons.business, Icons.healing, Icons.engineering];
+    
+    return Column(
+      children: topCarreras.asMap().entries.map((entry) {
+        final index = entry.key;
+        final carrera = entry.value;
+        
+        return _construirItemCarrera(
+          icono: iconos[index % iconos.length],
+          titulo: carrera,
+        );
+      }).toList(),
+    );
+  }
+
   Widget _construirItemCarrera({
     required IconData icono,
     required String titulo,
-    required String coincidencia,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -402,14 +430,6 @@ class _PantallaResultadosState extends State<PantallaResultados> {
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  coincidencia,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Color(0xFF658680),
-                  ),
                 ),
               ],
             ),

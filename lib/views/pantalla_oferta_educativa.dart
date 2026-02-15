@@ -19,6 +19,13 @@ class _PantallaOfertaEducativaState
     extends State<PantallaOfertaEducativa> {
   final OfertaEducativaViewModel _viewModel = OfertaEducativaViewModel();
 
+  @override
+  void initState() {
+    super.initState();
+    // Filtrar instituciones según la carrera seleccionada
+    _viewModel.filtrarInstitucionesPorCarrera(widget.carrera);
+  }
+
   void _navigateToTab(int index) {
     if (index == _viewModel.selectedIndex) return;
 
@@ -91,15 +98,29 @@ class _PantallaOfertaEducativaState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
-                      child: Text(
-                        'Universidades e Institutos',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF121617),
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Instituciones donde estudiar',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF121617),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.carrera,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF1B7298),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
@@ -119,9 +140,7 @@ class _PantallaOfertaEducativaState
                     const SizedBox(height: 16),
                     ..._viewModel.instituciones.map((institucion) {
                       return _construirItemInstitucion(
-                        imagenUrl: institucion.imagenUrl,
-                        nombre: institucion.nombre,
-                        direccion: institucion.direccion,
+                        institucion: institucion,
                       );
                     }),
                   ],
@@ -154,22 +173,25 @@ class _PantallaOfertaEducativaState
   }
 
   Widget _construirItemInstitucion({
-    required String imagenUrl,
-    required String nombre,
-    required String direccion,
+    required Institucion institucion,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      height: 72,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFDCE2E5)),
+        color: Colors.white,
+      ),
       child: Row(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               image: DecorationImage(
-                image: NetworkImage(imagenUrl),
+                image: NetworkImage(institucion.imagenUrl),
                 fit: BoxFit.cover,
               ),
             ),
@@ -180,25 +202,54 @@ class _PantallaOfertaEducativaState
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  nombre,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF121617),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _getTipoColor(institucion.tipo).withAlpha(25),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Text(
+                    institucion.tipo,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: _getTipoColor(institucion.tipo),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 6),
                 Text(
-                  direccion,
+                  institucion.nombre,
                   style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Color(0xFF657C86),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF121617),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      color: Color(0xFF657C86),
+                      size: 14,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        institucion.direccion,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.normal,
+                          color: Color(0xFF657C86),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -206,6 +257,16 @@ class _PantallaOfertaEducativaState
         ],
       ),
     );
+  }
+
+  Color _getTipoColor(String tipo) {
+    if (tipo.contains('Pública')) {
+      return const Color(0xFF22C55E); // Verde para públicas
+    } else if (tipo.contains('Privada')) {
+      return const Color(0xFF0052FF); // Azul para privadas
+    } else {
+      return const Color(0xFFF59E0B); // Amarillo para institutos
+    }
   }
 
   Widget _buildNavButton(int index, IconData icon, String label) {

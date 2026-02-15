@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/carrera.dart';
+import '../models/carrera_con_instituciones.dart';
+import 'recomendaciones_carreras_data.dart';
 
 /// ViewModel para la pantalla de recomendaciones de carreras.
 ///
@@ -10,45 +12,288 @@ class RecomendacionesViewModel with ChangeNotifier {
 
   int get selectedIndex => _selectedIndex;
 
-  /// Lista de carreras recomendadas
-  final List<Carrera> carreras = const [
-    Carrera(
-      nombre: 'Ingeniería de Software',
-      descripcion:
-          'Diseña, desarrolla y prueba aplicaciones de software. Colabora con equipos para crear soluciones innovadoras.',
-      imagenUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCmTa2J2w8KiwhBLHYqDM_U-HhJHqs0pWxWmXxAWkJb2XWCKv38ej_TjiGrbG4JD_h6cua8srjt8FWrTXlS4bNl4mWf2qRO39A0hOgTQ7kZA_L_13l0kOWvCAgvFNANY-17Rvfc2f_SPUJsqcHceYpfiIUu5bcHKAWIxUQ_8VkXfXzisPfDw1vcX3ePaiL31Fumd92fLqsydzU4Q5TDSD0QBrKa8iwAkTHR1JUjOABa7Gxj18BogNI3JsHhV--PtJPvIYkCpl0rmDNH',
-      portadaUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
-    ),
-    Carrera(
-      nombre: 'Enfermería',
-      descripcion:
-          'Proporciona atención directa al paciente, administra medicamentos y educa a pacientes y familias sobre el manejo de la salud.',
-      imagenUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuBLeo_Y0QWdhobDt-DLMRlf7LhRlZDYKViqMaUEFuSCzH22DVKtbvQon3TBkXvbGL4ANyNv39AhRewuZmFaXkG8sHxiUzplwLHoAdmW76T_C57a8TsOLMlsC9p9RQByPp9DyqIjdWO5m2zWTunCh2k7CxV2MRhfQNc8d19KlkRngtWKEQQMdAnWWM2JXiQ-E5WULk3D420bUL15YV-VtPJlBDLZXXkCcyk2d1N3j7y8Pr_aTCWyV4ZO1e3_2oQxoG7Qa_9mRcLC2A71',
-      portadaUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
-    ),
-    Carrera(
-      nombre: 'Ingeniería Mecánica',
-      descripcion:
-          'Diseña y analiza sistemas mecánicos, incluyendo máquinas, motores y herramientas. Enfoque en eficiencia e innovación.',
-      imagenUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuBEq1Y3_XIqaIk670m3aspVVLISiCT0mgpf0_99JfK_lOteRrueFqK4ctByh5B07cMO_bMSofJUMjrFQ1e1uOOXKM35doDIE_ktDMNwOqZYd71PZfvlQ2S5hRgsJ8lUyqdFSjthMTQ1c5OOEiNgZXM7CTPND7kHSLicpMOTu1GoZsrqk7hhZWeTwxj6CjNKxfCjMW_H-5T4tbgWTq_cZJIpiFggoqN_M35iGv08O_IvPYrRLkmov7cU-R0r8HJ0BdB18kkUMO2T7SU8',
-      portadaUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
-    ),
-    Carrera(
-      nombre: 'Administración de Empresas',
-      descripcion:
-          'Gestiona y supervisa operaciones comerciales, incluyendo marketing, finanzas y recursos humanos. Impulsa el éxito organizacional.',
-      imagenUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCXpYQX57cWaW_PH3fhFkZbRDI9yIej2zm13RCR2UF6rdjg83TPokK1_R0tSwkobQiepjuIAU2tpIYJv3lzlZPK-1lx9UrZni1waEKJkzHKtpLSrh8aLRSoe_fRJjzxZaOTbfyV1IKQ1hXCj16gpUKpenzZc9I83KRgMkSKNcSb9Jnkl7dwhrnJQxXtBWtAlQ5NL1IVqQAjxPKvScsnlWmsuNzhe2q1ybIeiRsxpkrjJoeoh8aKCVNQlIlMBgq62PFwmRRV1Un53W7k',
-      portadaUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCHnJQC5mqO1__8RaePTIFukja-bsjHnFO9ShfCOA6UGw9pmEp95jMSmUwcUFXqH4QUelaIyHG7pc0OPp2iVYvpzdD6fvGAXN_ZD1checjhxWdCKmomaj2bSrKYfYF4EKav9f08tHR0XzcyNpZ_hb1wOls-t2N6Fndwb7TdpV4hhb7XBpqx30ZVTMFEtq06QQpvKPGHm0HsCimmzQjtMqc4RwM1VSD-bqcd4PIIS3MlJU9Br_mv_T4bseyyYHar4FnsyTCNo4b5uLql',
-    ),
-  ];
+  /// Lista de todas las carreras
+  final List<Carrera> carreras = CarrerasData.carreras;
+
+  /// Mapa de carreras y sus instituciones asociadas
+  static final Map<String, List<String>> _carrerasInstituciones = {
+    // Carreras de salud - Universitarias (5 años)
+    'Enfermería': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+      InstitucionesMap.upla,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.utp,
+    ],
+    'Medicina General': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.upla,
+    ],
+    'Obstetricia': [
+      InstitucionesMap.upla,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.utp,
+    ],
+    'Odontología': [
+      InstitucionesMap.continental,
+      InstitucionesMap.upla,
+      InstitucionesMap.utp,
+    ],
+    'Farmacia y Bioquímica': [
+      InstitucionesMap.upla,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.utp,
+    ],
+    'Estomatología': [
+      InstitucionesMap.franklinRoosevelt,
+    ],
+    'Nutrición Humana': [
+      InstitucionesMap.upla,
+    ],
+    'Nutrición y Dietética': [
+      InstitucionesMap.utp,
+    ],
+    'Psicología': [
+      InstitucionesMap.continental,
+      InstitucionesMap.upla,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.utp,
+    ],
+    'Tecnología Médica': [
+      InstitucionesMap.continental,
+    ],
+    'Radiología': [
+      InstitucionesMap.upla,
+    ],
+    'Laboratorio Clínico y Anatomía Patológica': [
+      InstitucionesMap.upla,
+    ],
+    'Terapia Física y Rehabilitación': [
+      InstitucionesMap.upla,
+    ],
+    'Terapia Física': [
+      InstitucionesMap.utp,
+    ],
+    'Optometría': [
+      InstitucionesMap.upla,
+    ],
+    'Medicina Veterinaria y Zootecnia': [
+      InstitucionesMap.upla,
+    ],
+    'Enfermería Técnica': [
+      InstitucionesMap.tecnoInter,
+      InstitucionesMap.eugenioPaccelly,
+      InstitucionesMap.santaLucia,
+    ],
+    'Farmacia Técnica': [
+      InstitucionesMap.tecnoInter,
+      InstitucionesMap.eugenioPaccelly,
+      InstitucionesMap.santaLucia,
+    ],
+
+    // Carreras de ingeniería
+    'Ingeniería de Software': [
+      InstitucionesMap.utp,
+    ],
+    'Ingeniería de Sistemas': [
+      InstitucionesMap.unc,
+    ],
+    'Ingeniería de Sistemas e Informática': [
+      InstitucionesMap.continental,
+      InstitucionesMap.utp,
+    ],
+    'Ingeniería de Sistemas y Computación': [
+      InstitucionesMap.upla,
+    ],
+    'Ingeniería Civil': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+      InstitucionesMap.upla,
+      InstitucionesMap.utp,
+    ],
+    'Ingeniería de Minas': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+    ],
+    'Ingeniería Mecánica': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+    ],
+    'Ingeniería Eléctrica y Electrónica': [
+      InstitucionesMap.unc,
+    ],
+    'Ingeniería Eléctrica': [
+      InstitucionesMap.continental,
+    ],
+    'Ingeniería Industrial': [
+      InstitucionesMap.continental,
+      InstitucionesMap.upla,
+      InstitucionesMap.utp,
+    ],
+    'Ingeniería Mecatrónica': [
+      InstitucionesMap.continental,
+    ],
+    'Ingeniería Ambiental': [
+      InstitucionesMap.continental,
+      InstitucionesMap.utp,
+    ],
+    'Ingeniería del Medio Ambiente': [
+      InstitucionesMap.upla,
+    ],
+    'Ingeniería Metalúrgica y de Materiales': [
+      InstitucionesMap.unc,
+    ],
+    'Ingeniería Química': [
+      InstitucionesMap.unc,
+    ],
+    'Desarrollo de Sistemas de Información': [
+      InstitucionesMap.iepContinental,
+    ],
+    'Electricidad Industrial': [
+      InstitucionesMap.tecnoInter,
+    ],
+    'Mantenimiento de Maquinaria Pesada': [
+      InstitucionesMap.tecnoInter,
+    ],
+    'Construcción Civil': [
+      InstitucionesMap.tecnoInter,
+    ],
+    'Gestión de la Construcción': [
+      InstitucionesMap.iepContinental,
+    ],
+
+    // Carreras de arquitectura y diseño
+    'Arquitectura': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+      InstitucionesMap.upla,
+      InstitucionesMap.utp,
+    ],
+    'Diseño Profesional de Interiores': [
+      InstitucionesMap.utp,
+    ],
+    'Diseño de Interiores': [
+      InstitucionesMap.iepContinental,
+    ],
+    'Diseño de Modas': [
+      InstitucionesMap.iepContinental,
+    ],
+    'Diseño Gráfico Publicitario': [
+      InstitucionesMap.iepContinental,
+    ],
+    'Diseño y Programación Web': [
+      InstitucionesMap.tecnoInter,
+    ],
+    'Gastronomía': [
+      InstitucionesMap.iepContinental,
+      InstitucionesMap.sanPedro,
+    ],
+
+    // Carreras administrativas y económicas
+    'Administración de Empresas': [
+      InstitucionesMap.unc,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.utp,
+    ],
+    'Administración': [
+      InstitucionesMap.continental,
+    ],
+    'Administración y Sistemas': [
+      InstitucionesMap.upla,
+    ],
+    'Administración y Finanzas': [
+      InstitucionesMap.continental,
+      InstitucionesMap.upla,
+    ],
+    'Administración y Gestión Pública': [
+      InstitucionesMap.continental,
+    ],
+    'Administración y Marketing': [
+      InstitucionesMap.continental,
+      InstitucionesMap.utp,
+    ],
+    'Administración y Negocios Internacionales': [
+      InstitucionesMap.continental,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.utp,
+    ],
+    'Administración de Negocios Internacionales': [
+      InstitucionesMap.utp,
+    ],
+    'Administración de Negocios Bancarios y Financieros': [
+      InstitucionesMap.tecnoInter,
+    ],
+    'Gestión Administrativa': [
+      InstitucionesMap.eugenioPaccelly,
+    ],
+    'Gestión Logística': [
+      InstitucionesMap.tecnoInter,
+    ],
+    'Asistencia Administrativa': [
+      InstitucionesMap.santaLucia,
+    ],
+    'Contabilidad': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+    ],
+    'Contabilidad y Finanzas': [
+      InstitucionesMap.upla,
+    ],
+    'Economía': [
+      InstitucionesMap.unc,
+      InstitucionesMap.continental,
+      InstitucionesMap.utp,
+    ],
+
+    // Carreras de derecho y ciencias sociales
+    'Derecho': [
+      InstitucionesMap.upla,
+      InstitucionesMap.continental,
+      InstitucionesMap.franklinRoosevelt,
+      InstitucionesMap.utp,
+    ],
+    'Derecho y Ciencias Políticas': [
+      InstitucionesMap.unc,
+    ],
+    'Antropología': [
+      InstitucionesMap.unc,
+    ],
+    'Sociología': [
+      InstitucionesMap.unc,
+    ],
+    'Trabajo Social': [
+      InstitucionesMap.unc,
+    ],
+
+    // Carreras de comunicación y educación
+    'Ciencias de la Comunicación': [
+      InstitucionesMap.unc,
+      InstitucionesMap.utp,
+    ],
+    'Ciencias y Tecnología de la Comunicación': [
+      InstitucionesMap.continental,
+    ],
+    'Educación Inicial': [
+      InstitucionesMap.utp,
+    ],
+    'Educación Primaria': [
+      InstitucionesMap.upla,
+      InstitucionesMap.utp,
+    ],
+    'Educación Secundaria': [
+      InstitucionesMap.upla,
+    ],
+
+    // Carreras agropecuarias
+    'Agronomía': [
+      InstitucionesMap.unc,
+    ],
+    'Zootecnia': [
+      InstitucionesMap.unc,
+    ],
+  };
 
   void setSelectedIndex(int index) {
     _selectedIndex = index;
@@ -58,5 +303,10 @@ class RecomendacionesViewModel with ChangeNotifier {
   /// Obtiene el número de carreras recomendadas
   int getCarrerasCount() {
     return carreras.length;
+  }
+
+  /// Obtiene las instituciones donde se puede estudiar una carrera específica
+  List<String> getInstitucionesPorCarrera(String nombreCarrera) {
+    return _carrerasInstituciones[nombreCarrera] ?? [];
   }
 }

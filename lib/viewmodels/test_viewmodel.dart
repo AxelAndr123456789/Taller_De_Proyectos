@@ -26,10 +26,10 @@ class TestViewModel with ChangeNotifier {
 
   // Opciones de respuesta
   final List<String> options = [
-    'Totalmente en desacuerdo',
-    'En desacuerdo',
-    'De acuerdo',
     'Totalmente de acuerdo',
+    'De acuerdo',
+    'En desacuerdo',
+    'Totalmente en desacuerdo',
   ];
 
   // Tests disponibles

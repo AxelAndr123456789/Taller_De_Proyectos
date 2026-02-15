@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Stitch Career',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,      
       theme: ThemeData(
         fontFamily: 'Epilogue',
         useMaterial3: true,
