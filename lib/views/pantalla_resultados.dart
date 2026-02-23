@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/viewmodels.dart';
+import '../services/firebase_service.dart';
+import '../models/user_manager.dart';
 import 'views.dart';
 
 class PantallaResultados extends StatefulWidget {
@@ -11,6 +13,46 @@ class PantallaResultados extends StatefulWidget {
 
 class _PantallaResultadosState extends State<PantallaResultados> {
   final ResultadosViewModel _viewModel = ResultadosViewModel();
+  final FirebaseService _firebaseService = FirebaseService();
+  final UserManager _userManager = UserManager();
+  bool _resultadoGuardado = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _guardarResultado();
+  }
+
+  Future<void> _guardarResultado() async {
+    if (_resultadoGuardado) return;
+    
+    // Verificar que hay un usuario logueado
+    if (!_userManager.isLoggedIn || _userManager.currentUser == null) {
+      debugPrint('No hay usuario logueado para guardar resultado');
+      return;
+    }
+
+    final user = _userManager.currentUser!;
+    
+    // Guardar el resultado en Firestore
+    final success = await _firebaseService.guardarResultadoTest(
+      userEmail: user.email,
+      nombreCompleto: user.nombreCompleto,
+      carreraRecomendada: _viewModel.carreraRecomendada,
+      areaPrincipal: _viewModel.areaPrincipal,
+      porcentajesTest: _viewModel.getPorcentajesDesglose(),
+      carrerasAfines: _viewModel.getCarrerasAfines(),
+    );
+
+    if (success) {
+      setState(() {
+        _resultadoGuardado = true;
+      });
+      debugPrint('Resultado guardado exitosamente en Firestore');
+    } else {
+      debugPrint('Error al guardar resultado en Firestore');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

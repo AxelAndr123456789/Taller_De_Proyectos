@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
+  Future<void> _login() async {
     final emailValid = _emailFieldKey.currentState?.validate() ?? true;
     final passwordValid = _passwordFieldKey.currentState?.validate() ?? true;
 
@@ -33,7 +33,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _viewModel.setEmail(_emailController.text.trim());
       _viewModel.setPassword(_passwordController.text);
 
-      if (_viewModel.login()) {
+      final success = await _viewModel.login();
+
+      if (!mounted) return;
+
+      if (success) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const PantallaPrincipal()),
@@ -95,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: isDesktop ? 60 : 40),
                       _buildTextField(
                         label: 'Correo electrónico',
-                        hint: 'usuario@gmail.com',
+                        hint: 'Ingresa tu correo electrónico',
                         controller: _emailController,
                         isPassword: false,
                         validator: _viewModel.validateEmail,
@@ -135,11 +139,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             TextButton(
                               onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                        'Funcionalidad de crear cuenta en desarrollo'),
-                                    backgroundColor: Colors.blue,
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const RegisterScreen(),
                                   ),
                                 );
                               },
@@ -291,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _passwordController,
                       obscureText: !_viewModel.showPassword,
                       decoration: InputDecoration(
-                        hintText: 'password123',
+                        hintText: 'Ingresa tu contraseña',
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.all(16),
                       ),

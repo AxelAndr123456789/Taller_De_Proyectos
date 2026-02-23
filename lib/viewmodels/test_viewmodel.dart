@@ -109,16 +109,16 @@ class TestViewModel with ChangeNotifier {
     }
   }
 
-  void addTestResult(String testType, String testTitle) {
-    _resultManager.addResult(testType, testTitle);
+  Future<void> addTestResult(String testType, String testTitle) async {
+    await _resultManager.addResult(testType, testTitle);
     notifyListeners();
   }
 
-  void submitTest(String testType, String testTitle) {
+  Future<void> submitTest(String testType, String testTitle) async {
     _isSubmitting = true;
     notifyListeners();
 
-    _resultManager.addResult(testType, testTitle);
+    await _resultManager.addResult(testType, testTitle);
 
     if (_resultManager.areAllTestsCompleted()) {
       _isSubmitting = false;

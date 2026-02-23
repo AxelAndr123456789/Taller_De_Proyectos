@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../models/auth_model.dart';
+import '../services/firebase_service.dart';
+import '../models/user_manager.dart';
 
 /// ViewModel para la pantalla de login.
 ///
@@ -7,12 +8,13 @@ import '../models/auth_model.dart';
 /// comunicación entre Models y Views. Este ViewModel maneja la lógica
 /// de autenticación y notifica a la vista sobre cambios de estado.
 class LoginViewModel with ChangeNotifier {
-  final AuthModel _authModel = AuthModel();
+  final FirebaseService _firebaseService = FirebaseService();
+  final UserManager _userManager = UserManager();
 
   String _email = '';
   String _password = '';
   String _errorMessage = '';
-  final bool _isLoading = false;
+  bool _isLoading = false;
   bool _showPassword = false;
 
   String get email => _email;
@@ -63,23 +65,37 @@ class LoginViewModel with ChangeNotifier {
     return null;
   }
 
-  /// Intenta iniciar sesión con las credenciales actuales
+  /// Intenta iniciar sesión con las credenciales actuales desde Firestore
   /// Retorna true si la autenticación fue exitosa
-  bool login() {
+  Future<bool> login() async {
     if (_email.isEmpty || _password.isEmpty) {
       _errorMessage = 'Por favor completa todos los campos';
       notifyListeners();
       return false;
     }
 
-    final result = _authModel.validateCredentials(_email, _password);
+    _isLoading = true;
+    notifyListeners();
 
-    if (result.isSuccess) {
-      _errorMessage = '';
-      notifyListeners();
-      return true;
-    } else {
-      _errorMessage = result.errorMessage ?? 'Error desconocido';
+    try {
+      final user = await _firebaseService.validateCredentials(_email, _password);
+
+      _isLoading = false;
+
+      if (user != null) {
+        // Guardar el usuario en el UserManager
+        _userManager.registerUser(user);
+        _errorMessage = '';
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = 'Correo o contraseña incorrectos';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = 'Error al iniciar sesión: $e';
       notifyListeners();
       return false;
     }

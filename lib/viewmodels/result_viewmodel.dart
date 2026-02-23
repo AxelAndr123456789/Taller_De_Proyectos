@@ -11,8 +11,8 @@ class ResultViewModel with ChangeNotifier {
   bool get cycleCompleted => _resultManager.shouldResetForNewCycle();
   bool get allTestsCompleted => _resultManager.areAllTestsCompleted();
   
-  void addResult(String testType, String testTitle) {
-    _resultManager.addResult(testType, testTitle);
+  Future<void> addResult(String testType, String testTitle) async {
+    await _resultManager.addResult(testType, testTitle);
     notifyListeners();
   }
   

@@ -4,3 +4,7 @@ export 'carrera_con_instituciones.dart';
 export 'result_manager.dart';
 export 'auth_model.dart';
 export 'vocational_profile_calculator.dart';
+export 'user_model.dart';
+export 'user_manager.dart';
+export 'vocational_dataset.dart';
+export 'vocational_classifier.dart';

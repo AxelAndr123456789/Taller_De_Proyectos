@@ -6,3 +6,5 @@ export 'historial_viewmodel.dart';
 export 'oferta_educativa_viewmodel.dart';
 export 'recomendaciones_viewmodel.dart';
 export 'resultados_viewmodel.dart';
+export 'register_viewmodel.dart';
+export 'ml_viewmodel.dart';

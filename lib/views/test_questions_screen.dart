@@ -75,7 +75,7 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
     });
   }
 
-  void _goToNextQuestion() {
+  Future<void> _goToNextQuestion() async {
     if (_currentQuestion >= _totalQuestions && _isSubmitting) {
       return;
     }
@@ -113,29 +113,29 @@ class _TestQuestionsScreenState extends State<TestQuestionsScreen> {
       setState(() {
         _isSubmitting = true;
       });
-      
-      // Guardar todas las respuestas del test
+
+      // Guardar todas las respuestas del test y calcular resultado
       _resultManager.saveTestResponses(widget.testType, List.from(_allResponses));
-      _resultManager.addResult(widget.testType, widget.testTitle);
-      
+      await _resultManager.addResult(widget.testType, widget.testTitle);
+
       if (_resultManager.areAllTestsCompleted()) {
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const PantallaResultados()),
-            );
-          }
-        });
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const PantallaResultados()),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('¡${widget.testTitle} completado!'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('¡${widget.testTitle} completado!'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             Navigator.pushReplacement(

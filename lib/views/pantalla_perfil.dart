@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/user_manager.dart';
 import 'views.dart';
 
 class PantallaPerfil extends StatefulWidget {
@@ -10,6 +11,24 @@ class PantallaPerfil extends StatefulWidget {
 
 class _PantallaPerfilState extends State<PantallaPerfil> {
   int _selectedIndex = 4;
+  final UserManager _userManager = UserManager();
+
+  // Datos por defecto si no hay usuario registrado
+  Map<String, String> get _userData {
+    if (_userManager.isLoggedIn && _userManager.currentUser != null) {
+      return _userManager.getProfileData();
+    }
+    // Datos de ejemplo por defecto
+    return {
+      'nombreCompleto': 'Mateo Vargas',
+      'email': 'mateo.vargas@email.com',
+      'telefono': '+51 987 654 321',
+      'colegio': 'Colegio Nacional San José',
+      'grado': '5to año de secundaria',
+      'ubicacion': 'Junín, Perú',
+      'rol': 'Estudiante',
+    };
+  }
 
   void _navigateToTab(int index) {
     if (index == _selectedIndex) return;
@@ -112,31 +131,32 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Mateo Vargas',
-                      style: TextStyle(
+                    Text(
+                      _userData['nombreCompleto'] ?? 'Usuario',
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF121617),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Estudiante',
-                      style: TextStyle(
+                    Text(
+                      _userData['rol'] ?? 'Estudiante',
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
                         color: Color(0xFF657C86),
                       ),
                     ),
-                    const Text(
-                      'Junín, Perú',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: Color(0xFF657C86),
+                    if ((_userData['ubicacion'] ?? '').isNotEmpty)
+                      Text(
+                        _userData['ubicacion']!,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                          color: Color(0xFF657C86),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -159,13 +179,13 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               _construirItemInformacion(
                 icono: Icons.email_outlined,
                 titulo: 'Email',
-                valor: 'mateo.vargas@email.com',
+                valor: _userData['email'] ?? '',
               ),
 
               _construirItemInformacion(
                 icono: Icons.phone_outlined,
                 titulo: 'Teléfono',
-                valor: '+51 987 654 321',
+                valor: _userData['telefono'] ?? '',
               ),
 
               const Padding(
@@ -186,13 +206,13 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               _construirItemInformacion(
                 icono: Icons.school_outlined,
                 titulo: 'Colegio',
-                valor: 'Colegio Nacional San José',
+                valor: _userData['colegio'] ?? '',
               ),
 
               _construirItemInformacion(
                 icono: Icons.menu_book_outlined,
                 titulo: 'Grado',
-                valor: '5to año de secundaria',
+                valor: _userData['grado'] ?? '',
               ),
 
               Padding(
@@ -202,6 +222,8 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   height: 40,
                   child: ElevatedButton(
                     onPressed: () {
+                      // Cerrar sesión en el UserManager
+                      _userManager.logout();
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => const LoginScreen()),

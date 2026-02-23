@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../models/result_manager.dart';
 import '../models/test_result.dart';
+import '../models/user_manager.dart';
 import 'views.dart';
 
 class PantallaPrincipal extends StatefulWidget {
@@ -15,6 +16,17 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   int _selectedIndex = 0;
   bool _isTestHovered = false;
   final ResultManager _resultManager = ResultManager();
+  final UserManager _userManager = UserManager();
+
+  // Obtiene el primer nombre del usuario logueado
+  String get _primerNombre {
+    if (_userManager.isLoggedIn && _userManager.currentUser != null) {
+      final nombreCompleto = _userManager.currentUser!.nombreCompleto;
+      // Divide el nombre y toma el primer elemento
+      return nombreCompleto.split(' ').first;
+    }
+    return 'Usuario';
+  }
 
   void _navigateToTab(int index) {
     if (index == _selectedIndex) return;
@@ -100,7 +112,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Hola, Sofia',
+                            'Hola, $_primerNombre',
                             style: TextStyle(
                               fontSize: isDesktop ? 28 : 24,
                               fontWeight: FontWeight.bold,

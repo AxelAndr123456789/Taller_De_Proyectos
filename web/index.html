@@ -33,6 +33,25 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-dv_aM-IVNlXjzM3RPHA4M3P2ggxdpbQ",
+      authDomain: "tallerproyectos-2e7ac.firebaseapp.com",
+      projectId: "tallerproyectos-2e7ac",
+      storageBucket: "tallerproyectos-2e7ac.firebasestorage.app",
+      messagingSenderId: "968610372999",
+      appId: "1:968610372999:web:46aaa8d1d2d51a5ff34722",
+      measurementId: "G-X8WW31620G"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+  
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
