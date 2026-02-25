@@ -62,8 +62,8 @@ lib/
 
 Se utiliza Firebase como Backend-as-a-Service (BaaS):
 
-- Firebase Authentication (registro/login)
-- Cloud Firestore (base de datos NoSQL)
+- Firebase Authentication
+- Cloud Firestore 
 
 ---
 
@@ -162,7 +162,7 @@ android/app/
 ```
 
 5. Habilitar:
-   - Authentication (Email/Password)
+   - Authentication 
    - Cloud Firestore
 
 ---
@@ -183,7 +183,7 @@ flutter run
 flutter build apk --release
 ```
 
-### AppBundle (Play Store)
+### AppBundle - Play Store
 
 ```bash
 flutter build appbundle --release
@@ -226,3 +226,4 @@ Huancayo - Perú
 
 🔗 Repositorio:
 https://github.com/AxelAndr123456789/Taller_De_Proyectos
+
