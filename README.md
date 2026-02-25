@@ -1,179 +1,122 @@
-# 📱 Taller de Proyectos - Orientación Vocacional con IA
+# 📱 Sistema de Orientación Vocacional con IA
 
 <div align="center">
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![IA](https://img.shields.io/badge/IA-Machine%20Learning-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
 
-**Aplicación móvil con IA para orientación vocacional - Huancayo**
+**Aplicación móvil desarrollada en Flutter con Firebase como Backend**
+
+Huancayo - Perú | 2026
 
 </div>
 
 ---
 
-## 📋 Contenido
+## 📌 Descripción del Proyecto
 
-- [Descripción del Problema](#-descripción-del-problema)
-- [Justificación](#-justificación)
-- [Arquitectura](#-arquitectura)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Base de Datos (Firestore)](#-base-de-datos-firestore)
-- [Instalación](#-instalación)
-- [Build](#-build)
-- [Despliegue](#-despliegue)
-- [Evidencias Técnicas](#-evidencias-técnicas)
+Aplicación móvil desarrollada para brindar orientación vocacional a estudiantes de 4.° y 5.° de secundaria en la ciudad de Huancayo.
 
----
+El sistema permite:
 
-## 🎯 Descripción del Problema
-
-En la ciudad de **Huancayo**, los estudiantes de 4.° y 5.° de secundaria culminan sus estudios sin orientación vocacional sistemática, lo que genera:
-
-- Dificultad para identificar intereses y habilidades.
-- Decisiones basadas en información limitada.
-- Ausencia de herramientas digitales en instituciones educativas.
-
-### 📊 Estadísticas clave (Perú)
-
-- 30% de abandono universitario en el primer año.
-- 50% de estudiantes insatisfechos con su carrera.
-- Solo 10% de colegios cuentan con psicólogo vocacional.
-
-### ❗ Problema General
-
-La limitada orientación vocacional afecta la toma de decisiones académicas y profesionales debido a la ausencia de aplicativos móviles inteligentes que brinden recomendaciones personalizadas y contextualizadas a la realidad de Huancayo.
+- Registro e inicio de sesión de usuarios
+- Desarrollo de test vocacional
+- Procesamiento de resultados
+- Recomendación de carreras afines
+- Almacenamiento de resultados en la nube
 
 ---
 
-## 💡 Justificación
+## 🎯 Problema Identificado
 
-### ✔ Social
-Apoya a los estudiantes en la toma de decisiones informadas, reduce la deserción académica y brinda una herramienta de apoyo para docentes.
+Muchos estudiantes finalizan la secundaria sin una orientación vocacional clara, lo que genera:
 
-### ✔ Económica
-Minimiza pérdidas económicas por cambios de carrera y alinea intereses con la oferta educativa local.
+- Elección incorrecta de carrera
+- Insatisfacción académica
+- Abandono universitario temprano
 
-### ✔ Ambiental
-Reduce el uso de formularios impresos y papel.
-
-### ✔ ODS
-Contribuye a:
-- **ODS 4:** Educación de calidad.
-- **ODS 9:** Industria, innovación e infraestructura.
+El sistema propone una solución digital utilizando análisis de resultados y almacenamiento en la nube.
 
 ---
 
-## 🏗️ Arquitectura
+## 🏗 Arquitectura del Sistema
 
-### 🔹 Arquitectura General (Firebase como Backend)
+La aplicación sigue el patrón **MVVM (Model - View - ViewModel)**.
 
-```
-┌─────────────────────────────────────────────┐
-│              CAPA DE PRESENTACIÓN          │
-│   Aplicación Móvil - Flutter               │
-│   • Registro / Login                       │
-│   • Test vocacional (20 preguntas)         │
-│   • Resultados con IA                      │
-│   • Catálogo de carreras                   │
-├─────────────────────────────────────────────┤
-│              CAPA DE SERVICIOS             │
-│   Firebase SDK                             │
-│   • Authentication                         │
-│   • Firestore                              │
-│   • Storage                                │
-├─────────────────────────────────────────────┤
-│              CAPA DE DATOS                 │
-│   Firebase Cloud Firestore                 │
-│   • usuarios                               │
-│   • evaluaciones                           │
-│   • resultados                             │
-│   • carreras                               │
-│   • instituciones                          │
-└─────────────────────────────────────────────┘
-```
-
----
-
-## 🧩 Estructura del Proyecto (MVVM)
+### 📂 Estructura del Proyecto
 
 ```
 lib/
 │
-├── core/            # Constantes, temas y utilidades
-├── data/            # Modelos, repositorios, Firebase
-├── domain/          # Entidades y casos de uso
-└── presentation/    # BLoC, pantallas y widgets
+├── models/        # Modelos de datos
+├── services/      # Servicios Firebase
+├── viewmodels/    # Lógica de negocio
+├── views/         # Interfaces de usuario
+└── main.dart
 ```
 
 ---
 
-## 🗄️ Base de Datos (Firestore)
+## ☁️ Backend - Firebase
+
+Se utiliza Firebase como Backend-as-a-Service (BaaS):
+
+- Firebase Authentication (registro/login)
+- Cloud Firestore (base de datos NoSQL)
+
+---
+
+## 🗄 Estructura de Base de Datos (Firestore)
 
 ### 📁 Colección: usuarios
 
-```json
-{
-  "uid": "string",
-  "nombres": "string",
-  "apellidos": "string",
-  "edad": 16,
-  "institucion": "string",
-  "grado": "string",
-  "email": "string",
-  "fecha_registro": "timestamp"
-}
-```
-
-### 📁 Colección: evaluaciones
+Almacena información del perfil del estudiante.
 
 ```json
 {
-  "id_evaluacion": "string",
-  "uid": "string",
-  "fecha": "timestamp",
-  "respuestas": [
-    {
-      "pregunta_id": 1,
-      "categoria": "intereses",
-      "valor": 5
-    }
-  ]
+  "nombreCompleto": "Ana",
+  "correo": "ana@gmail.com",
+  "colegio": "Colegio Ingeniería",
+  "grado": "5to año de secundaria",
+  "telefono": "987654567"
 }
 ```
+
+---
 
 ### 📁 Colección: resultados
 
+Almacena los resultados generados tras completar el test vocacional.
+
 ```json
 {
-  "id_resultado": "string",
-  "id_evaluacion": "string",
-  "perfil_vocacional": "string",
-  "intereses": {
-    "cientifico": 85
+  "areaPrincipal": "Salud",
+  "carrerasAfines": [
+    "Medicina Humana",
+    "Psicología",
+    "Tecnología Médica"
+  ],
+  "porcentajesTest": {
+    "Aptitudes": 40,
+    "Intereses": 35,
+    "Personalidad": 25
   },
-  "habilidades": {
-    "analitica": 80
-  },
-  "areas_recomendadas": [
-    {
-      "area": "Ingeniería",
-      "afinidad": 85
-    }
-  ]
+  "respuesta": "Enfermería",
+  "fecha": "timestamp"
 }
 ```
 
+---
+
 ### 📁 Colección: carreras
+
+Contiene información general de cada carrera profesional.
 
 ```json
 {
-  "id_carrera": "string",
-  "nombre": "Ingeniería de Sistemas",
-  "descripcion": "Carrera orientada al desarrollo de software y sistemas informáticos.",
-  "area_vocacional": "Ingeniería",
-  "instituciones": ["UNCP", "UPLA"]
+  "nombre": "Administración de Empresas",
+  "descripcion": "Carrera orientada a la gestión organizacional y estratégica."
 }
 ```
 
@@ -186,34 +129,45 @@ lib/
 - Flutter SDK 3.16+
 - Dart SDK 3.2+
 - Android Studio o VS Code
-- Git
-- Cuenta de Firebase
+- Cuenta en Firebase
 
-### 🔹 Pasos
+---
 
-1️⃣ Clonar repositorio
+### 🔹 Clonar el repositorio
 
 ```bash
 git clone https://github.com/AxelAndr123456789/Taller_De_Proyectos.git
 cd Taller_De_Proyectos
 ```
 
-2️⃣ Instalar dependencias
+---
+
+### 🔹 Instalar dependencias
 
 ```bash
 flutter pub get
 ```
 
-3️⃣ Configurar Firebase
+---
 
-- Crear proyecto en Firebase Console.
-- Registrar app Android (paquete: `com.example.taller_proyectos`).
-- Descargar `google-services.json` y colocarlo en `android/app/`.
-- Habilitar:
-  - Authentication (email/password)
-  - Firestore Database
+### 🔹 Configurar Firebase
 
-4️⃣ Ejecutar aplicación
+1. Crear proyecto en Firebase Console.
+2. Registrar aplicación Android.
+3. Descargar `google-services.json`.
+4. Colocar el archivo en:
+
+```
+android/app/
+```
+
+5. Habilitar:
+   - Authentication (Email/Password)
+   - Cloud Firestore
+
+---
+
+### 🔹 Ejecutar la aplicación
 
 ```bash
 flutter run
@@ -221,165 +175,54 @@ flutter run
 
 ---
 
-## 🔧 Build
+## 🔧 Build de Producción
 
-### 📦 APK Android
+### APK
 
 ```bash
 flutter build apk --release
-flutter build apk --split-per-abi
 ```
 
-Salida:
-```
-build/app/outputs/flutter-apk/
-```
-
-### 📦 AppBundle (Play Store)
+### AppBundle (Play Store)
 
 ```bash
 flutter build appbundle --release
 ```
 
-Salida:
-```
-build/app/outputs/bundle/release/app-release.aab
-```
+---
 
-### 🌐 Web
+## 📊 Pruebas Realizadas
 
-```bash
-flutter build web --release
-```
-
-Salida:
-```
-build/web/
-```
+- Registro de usuario ✅
+- Inicio de sesión ✅
+- Desarrollo completo del test vocacional ✅
+- Generación de resultados ✅
+- Almacenamiento en Firestore ✅
 
 ---
 
-## 📤 Despliegue
+## 🔐 Seguridad
 
-### Opción 1: Google Play Store
-
-1. Generar AppBundle (.aab).
-2. Crear cuenta en Google Play Console.
-3. Subir archivo y publicar.
-
-### Opción 2: GitHub Releases
-
-```bash
-git tag -a v1.0.0 -m "Versión 1.0.0"
-git push origin v1.0.0
-```
-
-Subir APK manualmente en la sección Releases.
-
-### Opción 3: Firebase Hosting (Web)
-
-```bash
-npm install -g firebase-tools
-firebase init hosting
-flutter build web
-firebase deploy --only hosting
-```
+- Autenticación gestionada por Firebase Authentication.
+- Base de datos protegida mediante reglas de seguridad de Firestore.
+- Validación de campos en formularios.
 
 ---
 
-## 📊 Evidencias Técnicas
+## 🎓 Proyecto Académico
 
-### 🔹 1. Pruebas Funcionales (30 pruebas)
+**Universidad Continental**  
+Taller de Proyectos I  
 
-| Módulo             | Pruebas | % Éxito |
-|--------------------|---------|---------|
-| Registro           | 5       | 100%    |
-| Login              | 5       | 100%    |
-| Test vocacional    | 8       | 100%    |
-| Procesamiento IA   | 5       | 85%     |
-| Resultados         | 4       | 88%     |
-| **TOTAL**          | 30      | 95.5%   |
+Integrantes:
+- Cortez Ponce Brianna
+- Lopez Rodriguez Axel
+- Meza Calderon Ana  
 
----
-
-### 🔹 2. Pruebas Unitarias
-
-```bash
-flutter test
-```
-
-- 45 pruebas ejecutadas.
-- 78% de cobertura.
+Huancayo - Perú  
+2026
 
 ---
 
-### 🔹 3. Rendimiento
-
-| Métrica            | Resultado |
-|--------------------|------------|
-| Inicio de app      | 1.2 seg    |
-| Procesamiento IA   | 1.8 seg    |
-| FPS                | 60 fps     |
-| Memoria            | 85 MB      |
-| Tamaño APK         | 18 MB      |
-
----
-
-### 🔹 4. Compatibilidad
-
-- Android: API 21+ (99% de dispositivos).
-- Web: Chrome, Firefox, Safari y Edge.
-
----
-
-### 🔹 5. Seguridad
-
-| Requerimiento              | Estado |
-|----------------------------|--------|
-| Contraseñas cifradas       | ✅     |
-| Reglas Firestore           | ✅     |
-| Validación de entrada      | ✅     |
-
----
-
-### 🔹 6. Precisión del Modelo IA
-
-| Área        | Precisión |
-|-------------|------------|
-| Ingeniería  | 87%        |
-| Salud       | 89%        |
-| Educación   | 84%        |
-| Negocios    | 82%        |
-| **Promedio**| 85%        |
-
----
-
-### 🔹 7. Pruebas Piloto (30 estudiantes)
-
-| Criterio                     | Puntaje (1-5) |
-|------------------------------|---------------|
-| Facilidad de uso             | 4.7           |
-| Claridad de preguntas        | 4.8           |
-| Comprensión de resultados    | 4.5           |
-| Utilidad de recomendaciones  | 4.6           |
-| **Promedio**                 | 4.68          |
-
----
-
-<div align="center">
-
-**UNIVERSIDAD CONTINENTAL**  
-Taller de Proyectos I - NRC: 19162  
-Docente: Job Daniel Gamarra Moreno  
-
-Integrantes:  
-Cortez Ponce Brianna  
-Lopez Rodriguez Axel  
-Meza Calderon Ana  
-
-Huancayo, Perú - 2026  
-
-🔗 Repositorio:  
+🔗 Repositorio:
 https://github.com/AxelAndr123456789/Taller_De_Proyectos
-
-</div>
