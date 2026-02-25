@@ -209,21 +209,24 @@ flutter build appbundle --release
 
 ---
 
-## 🎓 Proyecto Académico
+<div align="center">
 
-**Universidad Continental**  
-Taller de Proyectos I  
+**UNIVERSIDAD CONTINENTAL**  
+Taller de Proyectos I - NRC: 19162  
+Docente: Job Daniel Gamarra Moreno  
 
-Integrantes:
-- Cortez Ponce Brianna
-- Lopez Rodriguez Axel
-- Meza Calderon Ana  
+Integrantes:  
+Cortez Ponce Brianna  
+Lopez Rodriguez Axel  
+Meza Calderon Ana  
 
-Huancayo - Perú  
-2026
+Huancayo, Perú - 2026  
+
+🔗 Repositorio:  
+https://github.com/AxelAndr123456789/Taller_De_Proyectos
+
+</div>
 
 ---
 
-🔗 Repositorio:
-https://github.com/AxelAndr123456789/Taller_De_Proyectos
 
