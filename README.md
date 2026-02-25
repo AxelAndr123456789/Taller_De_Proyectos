@@ -122,6 +122,24 @@ Contiene información general de cada carrera profesional.
 
 ---
 
+## 🎥 Video Demostrativo
+
+Se realizó un video demostrativo donde se muestra el funcionamiento completo de la aplicación:
+
+- Registro de usuario  
+- Inicio de sesión  
+- Desarrollo del test vocacional  
+- Procesamiento de resultados  
+- Recomendación de carreras  
+- Almacenamiento en la nube (Firestore)  
+
+🔗 **Enlace al video:**  
+https://drive.google.com/drive/folders/181xi8Ne9c5McYriVyzKXa5VjKflBGm8R
+
+> El video incluye una demostración en tiempo real desde un dispositivo Android mostrando el flujo completo del sistema.
+
+---
+
 ## 🚀 Instalación
 
 ### 🔹 Prerrequisitos
@@ -228,5 +246,3 @@ https://github.com/AxelAndr123456789/Taller_De_Proyectos
 </div>
 
 ---
-
-
